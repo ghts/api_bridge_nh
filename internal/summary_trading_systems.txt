@@ -1,0 +1,143 @@
+A trading system is a precise set of rules that automatically defines,
+ without any human discretionary intervention,
+ the entry and the exit on the markets.
+Rules should be precise, so trading system can be statistically testable.
+We can figure out how the system performed in the past and
+ how it could perform in the future with a certain degree of confidence.
+After money management rule and a portfolio rule,
+ which define entry and exit on the market then you have a "trading strategy" or,
+ a completely automatic approach to the markets, given a starting capital.
+
+Money management means "how much" to invest on a particular trade,
+ or position sizing or how many shares to buy and sell.
+Construction of portfolio of systems on uncorrelated price series,
+ then money management is foremost what we should deal with.
+Risk management means where to place an initial stop loss or a target price and so on.
+
+Develop and implement a trading system needs a software that easily performs
+ all the programming and testing facilities and goes directly to the market
+ without any interference by the user.
+You could have algorithmic trading signals provided by a computer,
+ but not automatically place them on the markets.
+The main hindrance for the trading system user is to produce trading signals
+ that he is not mentally fit to place in the marketplace.
+Automated trading platform which automatically trades the mechanical signals
+ produced by the trading system is thus a major advance.
+
+The trader has a predefined set of rules that are applied discretionally
+ in order to enter of exit the market, without any testing process
+ and without any automation of orders,
+ and resting on a final judgement if and when to enter or exit the market,
+ that set of rules is "trading methodology".
+A "trading methodology" always involves a bit of judgement and discretion.
+If past behaviour of the trading methodology is analyzed with statistical tests,
+ and all the signals are equally placed on the market,
+ it is more of a "trading system".
+
+The term "quantitative trading" conveys an idea of something scientific and
+ seems to take for granted that a trading system must be a long series of rules,
+ programmed in a complicated way.
+Salesman know very well that complexity raises price.
+But, complexity also raises the probability that a trading system will fail in the real world.
+There is no approach more false than this.
+
+Trading system could be very easy in their logical implementation.
+To rely on your own trading decisions on something "easy" will not reduce your success probability.
+On the contrary, it will increase it.
+
+On the way to success, a lot will be done by
+ - money management
+ - portfolio construction
+ - risk management
+ - time frame.
+
+So, do not be worried when you examine a trading formula that is simple and produce an
+ equity line that appears unexicting. because you need to always reason under the portfolio constraint.
+It must be clear from the very beginning that a mediocre trading system
+ - if applied to a portfolio of markets - will easily produce a good looking equity line.
+
+A huge economic literature shows without any doubt that
+ just a few percent of traders are able to beat the market year after year.
+Most of both the retail and institutional traders sooner or later will go bust.
+If you do not belong to the lucky category of winning discretionary traders,
+ then the "only option" for you in order to survive is the use of trading system.
+Successful discretionary traders are intuitively blessed
+ and are unconsciously able to predict the market moves with their gut feeling.
+On the contrary, there are many successful money managers, institutional and retail traders
+ that profit from predetermined trading strategies and investing methodologies.
+But it would be misleading to think that a trading system could easily overcome
+ all the hindrances trading creates.
+A trading system from one side could help the trader to beat the market
+ but from the other side will create a new set of problemss
+ that a discretionary trader does not know.
+
+First of all, if the trader has problems in terms of courage and have difficulty in pulling the trigger,
+ trading system will not be the ultimate solution.
+Like Larry Williams says, 'trading systems work, systme traders do not'.
+There is no bigger infamy for a systematic trader than not to take a signal, as Bill Eckhardt wrote:
+----------------------------------------------------------------------------------------------
+If you make a bad trade, you have money management,
+ you have a whole bunch of things that will come to your aid,
+ and you're really not in so much trouble if you make a bad trade.
+But if you miss a good trade, there's really nowhere to turn.
+If you miss good trades with any regularity, you're finished, you're doomed in this game.
+----------------------------------------------------------------------------------------------
+
+Second, in order to trust a trading system, especially during gloom periods
+ when drawdown will erase the trader's confidence in the trading system's capabilities,
+ you really need to do a huge amount of research and statistical work
+ that not everybody is able to do.
+To develop, implement, test and evaluate a trading system is not an everyday job.
+
+Finally, many of the drawbacks that affect discrretionary trading still affect systematic trading,
+ e.g. lack of sufficient starting capital,
+ possibility to diversify the portfolio,
+ fulltime, 24-hour, dedication.
+
+More importantly, we can say that trading is not a rational enterprise.
+It is not an activity where you can, given some premises, arrive
+ at a unique conclusion or where everything could be explained in a logical way.
+Fear and greed manipulate prices in a way that the human mind is unable to grasp.
+There are of course some fortunate discretinary traders that can beat the market
+ with gut feeling but in these instances they do not often manage to fully explain
+ why they buy and sell.
+If all this is true, the consequence would be that you need a tool that is not rational,
+ and not logical to enter and exit the market, something that you could not fully understand,
+ something that is counterintuitive.
+Usually the signals that you believe to be illogical or simply prone to failure wil be the big winners.
+
+To use a mechanical trading system meas that you need to discard widely held beliefs about finance
+ and over all discard the "feel-good" approach to trading.
+Everybody usually feels comfortable buying dips and uncomfortable buying the highest high,
+ but it may be the case that just the latter methodology is the good one.
+Testing a trading system could mean being forced by the brutal power of numbers
+ to a trading  attitude where you do not feel at ease.
+To be a fully mechanical trader means, in conclusion, to use violence against yourself.
+This is the only way to profits, unless you are one of the fortunate gun slingers
+ that make money day after day and do not even know how.
+
+The essence of technical analysis is statistical inference.
+It attempts to discover generalisations from historical data in the form of
+ patterns, rules and so forth and then extrapolate them to the future.
+  - statistical inference
+ - functional relationships among variables
+
+Hypothetic-deductive (연역적 추리 가설) method.
+1. Observation
+ : Through continuous observation, the system developer devises a relationship among variables.
+2. Hypothesis
+ : The system developer understands that the relationship he hypothesises is
+    not due to the particular nature of the sample,
+    but common to the majority of the samples he can deduct from the whole population of data.
+3. Prediction
+ : Construct the prediction (or conditional proposition) which tell us
+    what should be observed in a new set of  observations if the hypothesis is indeed true.
+   (quoted from "Evidence-Based Technical Analysis")
+4. Verification
+ : The system developer verifies if the prediction holds true in a new set of observations.
+5. Conclusion
+ : Through the use of statistical inference tools such as confidence intervals and hypothesis tests,
+   the system developer will decide if the hypothesis is true of false weighing
+   whether new observation will confirm the predictions.
+
+The same method is used in applied sciences like chemistry or biology.
