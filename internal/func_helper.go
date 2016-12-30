@@ -77,6 +77,8 @@ func F초기화() (에러 error) {
 		<-ch초기화
 	}
 
+	lib.New소켓_질의(lib.P주소_NH_TR, lib.CBOR, lib.P10초).S질의(&(lib.S질의값_단순TR{TR구분:lib.TR접속})).G응답()
+
 	return nil
 }
 

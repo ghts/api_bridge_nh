@@ -382,7 +382,7 @@ func f소켓TR_처리_도우미(수신_메시지 lib.I소켓_메시지) (응답_
 		return lib.New소켓_메시지(변환_형식, 접속_여부)
 	case lib.TR종료:
 		close(lib.F공통_종료_채널())
-		return nil  // 회신 하지 않음.
+		return nil, nil  // 회신 하지 않음.
 	default:
 		lib.F패닉("예상하지 못한 TR구분. %v", TR구분)
 	}

@@ -16,6 +16,8 @@ REM Bootstrapping cross-compile
 REM go tool dist install -v runtime
 REM go install -v -a std
 
+del api_bridge_nh.exe
+
 cls
 go build api_bridge_nh.go
 
