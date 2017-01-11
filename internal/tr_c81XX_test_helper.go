@@ -270,7 +270,7 @@ func f정정주문_테스트_도우미(t *testing.T, 계좌번호 string, 종목
 
 	var 주문번호 int64
 
-	정정주문_질의값 := new(lib.S질의값_정정주문)
+	정정주문_질의값 := new(lib.S질의값_정정주문_NH)
 	정정주문_질의값.TR구분 = lib.TR주문
 	정정주문_질의값.TR코드 = lib.NH_TR주식_정정
 	정정주문_질의값.M증권사 = lib.P증권사_NH
@@ -403,7 +403,7 @@ func f취소주문_테스트_도우미(t *testing.T, 계좌번호 string, 종목
 
 	var 주문번호 int64
 
-	취소주문_질의값 := new(lib.S질의값_취소주문)
+	취소주문_질의값 := new(lib.S질의값_취소주문_NH)
 	취소주문_질의값.TR구분 = lib.TR주문
 	취소주문_질의값.TR코드 = lib.NH_TR주식_취소
 	취소주문_질의값.M증권사 = lib.P증권사_NH

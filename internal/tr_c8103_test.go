@@ -41,7 +41,6 @@ import (
 
 func TestC8103_주식_정정주문(t *testing.T) {
 	if !lib.F한국증시_정규시장_거래시간임() {
-		lib.F문자열_출력("거래시간이 아니어서 주문 테스트 건너뜀.")
 		t.SkipNow()
 	}
 

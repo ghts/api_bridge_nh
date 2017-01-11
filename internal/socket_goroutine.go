@@ -45,29 +45,28 @@ import (
 var 실시간_정보_중계_중 = lib.New안전한_bool(false)
 
 // SUB-PUB기반 실시간 정보 중계
-func go루틴_API_실시간_정보_중계(ch초기화 chan lib.T신호) {
-	var 에러 error
+func Go루틴_API_실시간_정보_중계(ch초기화 chan lib.T신호) (에러 error) {
 	defer lib.F에러패닉_처리(lib.S에러패닉_처리{M에러: &에러})
 
 	if 실시간_정보_중계_중.G값() {
 		ch초기화 <- lib.P신호_초기화
-		return
+		return nil
 	} else if 에러 = 실시간_정보_중계_중.S값(true); 에러 != nil {
 		ch초기화 <- lib.P신호_초기화
-		return
+		return 에러
 	}
 
 	defer 실시간_정보_중계_중.S값(false)
 
-	소켓PUB_CBOR, 에러 := lib.New소켓PUB(lib.P주소_NH실시간_CBOR)
+	소켓PUB_CBOR, 에러 := lib.New소켓PUB(lib.P주소_NH_실시간_CBOR)
 	lib.F에러2패닉(에러)
 	defer 소켓PUB_CBOR.Close()
 
-	소켓PUB_MsgPack, 에러 := lib.New소켓PUB(lib.P주소_NH실시간_MsgPack)
+	소켓PUB_MsgPack, 에러 := lib.New소켓PUB(lib.P주소_NH_실시간_MsgPack)
 	lib.F에러2패닉(에러)
 	defer 소켓PUB_MsgPack.Close()
 
-	소켓PUB_JSON, 에러 := lib.New소켓PUB(lib.P주소_NH실시간_JSON)
+	소켓PUB_JSON, 에러 := lib.New소켓PUB(lib.P주소_NH_실시간_JSON)
 	lib.F에러2패닉(에러)
 	defer 소켓PUB_JSON.Close()
 
@@ -94,13 +93,10 @@ func go루틴_API_실시간_정보_중계(ch초기화 chan lib.T신호) {
 				}
 			}
 		case <-ch종료:
-			에러 = nil
-			return
+			return nil
 		default:
-			// non-blocking방식으로 동작
+			lib.F실행권한_양보()
 		}
-
-		lib.F실행권한_양보()
 	}
 }
 
@@ -113,21 +109,20 @@ var TR소켓_중계_중 = lib.New안전한_bool(false)
 const TR처리_도우미_수량 = 200
 
 // go-mangos의 raw모드를 사용하여 병렬처리.
-func go루틴_소켓TR_중계(ch초기화 chan lib.T신호) {
-	var 에러 error
+func Go루틴_소켓TR_중계(ch초기화 chan lib.T신호) (에러 error) {
 	defer lib.F에러패닉_처리(lib.S에러패닉_처리{M에러: &에러})
 
 	if TR소켓_중계_중.G값() {
 		ch초기화 <- lib.P신호_초기화
-		return
+		return nil
 	} else if 에러 = TR소켓_중계_중.S값(true); 에러 != nil {
 		ch초기화 <- lib.P신호_초기화
-		return
+		return 에러
 	}
 
 	defer TR소켓_중계_중.S값(false)
 
-	// 병렬처리를 위해서 raw모드를 사용함. raw모드 사용법은 go-mangos 예제를 참고하였음.
+	// 병렬처리를 위해서 raw모드를 사용함. raw모드 사용법은 go-mangos 예제를 참고.
 	소켓REP, 에러 := lib.New소켓REP_raw(lib.P주소_NH_TR)
 	ch도우미_초기화 := make(chan lib.T신호, TR처리_도우미_수량)
 	ch도우미_종료 := make(chan error, TR처리_도우미_수량)
@@ -161,8 +156,7 @@ func go루틴_소켓TR_중계(ch초기화 chan lib.T신호) {
 				}
 			}
 		case <-ch종료:
-			에러 = nil
-			return
+			return nil
 		default:
 			lib.F실행권한_양보()
 		}
@@ -210,7 +204,6 @@ func f소켓TR_처리(소켓REP mangos.Socket, ch초기화 chan<- lib.T신호, c
 
 		select {
 		case <-ch공통종료:
-			에러 = nil
 			return
 		default: // OK
 		}
@@ -233,7 +226,7 @@ func f소켓TR_처리_도우미(수신_메시지 lib.I소켓_메시지) (응답_
 
 	// TR처리
 	switch TR구분 {
-	case lib.TR조회:
+	case lib.TR조회, lib.TR주문:
 		TR응답_모음 := make([]*lib.S바이트_변환_매개체, 0)
 		채널_질의 := lib.New채널_질의(ch조회, lib.P30초, 10).S질의(수신_메시지)
 
@@ -273,15 +266,6 @@ func f소켓TR_처리_도우미(수신_메시지 lib.I소켓_메시지) (응답_
 				return f일반TR_응답_메시지_생성(변환_형식, TR질의값, TR응답_모음)
 			}
 		}
-	case lib.TR주문:
-		// TODO
-		lib.F체크포인트("주문TR 처리할 것.")
-
-		응답_메시지, _ = lib.New소켓_메시지_에러("미구현")
-		lib.F체크포인트(응답_메시지.G길이())
-		lib.F체크포인트(응답_메시지.G바이트_모음(0))
-
-		return lib.New소켓_메시지_에러("미구현")
 	case lib.TR실시간_정보_구독, lib.TR실시간_정보_해지:
 		채널_질의 := lib.New채널_질의(ch실시간_정보_구독_및_해지, lib.P30초, 10).S질의(수신_메시지)
 
@@ -382,7 +366,7 @@ func f소켓TR_처리_도우미(수신_메시지 lib.I소켓_메시지) (응답_
 		return lib.New소켓_메시지(변환_형식, 접속_여부)
 	case lib.TR종료:
 		close(lib.F공통_종료_채널())
-		return nil, nil  // 회신 하지 않음.
+		return nil, nil // 회신 하지 않음.
 	default:
 		lib.F패닉("예상하지 못한 TR구분. %v", TR구분)
 	}

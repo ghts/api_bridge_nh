@@ -44,7 +44,10 @@ import (
 )
 
 func TestC1101_주식_현재가(t *testing.T) {
-	lib.F대기(lib.P3초)
+	if !lib.F한국증시_정규시장_거래시간임() {
+		t.SkipNow()
+	}
+
 	lib.F테스트_에러없음(t, f접속_확인())
 
 	기본_정보 := new(lib.NH주식_현재가_조회_기본_정보)
@@ -316,10 +319,7 @@ func f주식_현재가_조회_기본_정보_테스트(t *testing.T, s *lib.NH주
 
 	lib.F테스트_참임(t, utf8.ValidString(s.M서킷_브레이커_구분))
 	lib.F테스트_같음(t, s.M서킷_브레이커_구분, "", "CB발동", "CB해제", "장종료")
-
-	if !strings.Contains(s.M종목명, "ETN") {
-		lib.F테스트_참임(t, s.M액면가 > 0, s.M종목코드, s.M액면가, s.M종목코드, s.M종목명) // ETN은 액면가가 없음.
-	}
+	lib.F테스트_참임(t, s.M액면가 >= 0, s.M종목코드, s.M액면가, s.M종목코드, s.M종목명) // ETN은 액면가가 없음.
 	//lib.F테스트_참임(t, strings.Contains(s.M전일_종가_타이틀, "전일종가"))
 	lib.F테스트_참임(t, lib.F오차율(s.M상한가, float64(s.M전일_종가)*1.3) < 5)
 	lib.F테스트_참임(t, lib.F오차율(s.M하한가, float64(s.M전일_종가)*0.7) < 5)
@@ -342,9 +342,6 @@ func f주식_현재가_조회_기본_정보_테스트(t *testing.T, s *lib.NH주
 	if lib.F한국증시_정규시장_거래시간임() {
 		lib.F테스트_참임(t, s.M거래원_정보_수신_시각.After(개장_시각))
 		lib.F테스트_참임(t, s.M시각.Before(삼분후))
-	} else {
-		lib.F테스트_참임(t, s.M거래원_정보_수신_시각.Hour() == 15 ||
-			s.M거래원_정보_수신_시각.Hour() == 16, s.M거래원_정보_수신_시각)
 	}
 
 	매도_거래량_합계 := int64(0)

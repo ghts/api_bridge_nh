@@ -42,7 +42,30 @@ import (
 	"time"
 )
 
+func TestF자료형_상수(t *testing.T) {
+	lib.F테스트_같음(t, nh주식_현재가_조회_기본, lib.F자료형_문자열(lib.NH주식_현재가_조회_기본_정보{}))
+	lib.F테스트_같음(t, nh주식_현재가_조회_변동, lib.F자료형_문자열(make([]*lib.NH주식_현재가_조회_변동_거래량_정보, 0)))
+	lib.F테스트_같음(t, nh주식_현재가_조회_동시호가, lib.F자료형_문자열(lib.NH주식_현재가_조회_동시호가_정보{}))
+
+	lib.F테스트_같음(t, nhETF_현재가_조회_기본, lib.F자료형_문자열(lib.NH_ETF_현재가_조회_기본_정보{}))
+	lib.F테스트_같음(t, nhETF_현재가_조회_변동, lib.F자료형_문자열(make([]*lib.NH_ETF_현재가_조회_변동_거래량_정보, 0)))
+	lib.F테스트_같음(t, nhETF_현재가_조회_동시호가, lib.F자료형_문자열(lib.NH_ETF_현재가_조회_동시호가_정보{}))
+	lib.F테스트_같음(t, nhETF_현재가_조회_ETF, lib.F자료형_문자열(lib.NH_ETF_현재가_조회_ETF정보{}))
+	lib.F테스트_같음(t, nhETF_현재가_조회_지수, lib.F자료형_문자열(lib.NH_ETF_현재가_조회_지수_정보{}))
+
+	lib.F테스트_같음(t, nh호가_잔량, lib.F자료형_문자열(lib.NH호가_잔량{}))
+	lib.F테스트_같음(t, nh시간외_호가_잔량, lib.F자료형_문자열(lib.NH시간외_호가잔량{}))
+	lib.F테스트_같음(t, nh예상_호가_잔량, lib.F자료형_문자열(lib.NH예상_호가잔량{}))
+	lib.F테스트_같음(t, nh체결, lib.F자료형_문자열(lib.NH체결{}))
+	lib.F테스트_같음(t, nhETF_NAV, lib.F자료형_문자열(lib.NH_ETF_NAV{}))
+	lib.F테스트_같음(t, nh업종_지수, lib.F자료형_문자열(lib.NH업종지수{}))
+}
+
 func TestTR소켓_주식_현재가_조회(t *testing.T) {
+	if !lib.F한국증시_정규시장_거래시간임() {
+		t.SkipNow()
+	}
+
 	lib.F대기(lib.P3초)
 	lib.F테스트_에러없음(t, f접속_확인())
 
@@ -105,15 +128,15 @@ func TestTR소켓_실시간_서비스_등록_및_해지(t *testing.T) {
 	lib.F테스트_에러없음(t, 에러)
 	defer TR소켓.Close()
 
-	소켓SUB_CBOR, 에러 := lib.New소켓SUB(lib.P주소_NH실시간_CBOR)
+	소켓SUB_CBOR, 에러 := lib.New소켓SUB(lib.P주소_NH_실시간_CBOR)
 	lib.F테스트_에러없음(t, 에러)
 	defer 소켓SUB_CBOR.Close()
 
-	소켓SUB_JSON, 에러 := lib.New소켓SUB(lib.P주소_NH실시간_JSON)
+	소켓SUB_JSON, 에러 := lib.New소켓SUB(lib.P주소_NH_실시간_JSON)
 	lib.F테스트_에러없음(t, 에러)
 	defer 소켓SUB_JSON.Close()
 
-	소켓SUB_MsgPack, 에러 := lib.New소켓SUB(lib.P주소_NH실시간_MsgPack)
+	소켓SUB_MsgPack, 에러 := lib.New소켓SUB(lib.P주소_NH_실시간_MsgPack)
 	lib.F테스트_에러없음(t, 에러)
 	defer 소켓SUB_MsgPack.Close()
 
@@ -222,15 +245,15 @@ func TestRT소켓_실시간_정보_수신(t *testing.T) {
 	lib.F테스트_에러없음(t, 에러)
 	defer TR소켓.Close()
 
-	소켓SUB_CBOR, 에러 := lib.New소켓SUB(lib.P주소_NH실시간_CBOR)
+	소켓SUB_CBOR, 에러 := lib.New소켓SUB(lib.P주소_NH_실시간_CBOR)
 	lib.F테스트_에러없음(t, 에러)
 	defer 소켓SUB_CBOR.Close()
 
-	소켓SUB_MsgPack, 에러 := lib.New소켓SUB(lib.P주소_NH실시간_MsgPack)
+	소켓SUB_MsgPack, 에러 := lib.New소켓SUB(lib.P주소_NH_실시간_MsgPack)
 	lib.F테스트_에러없음(t, 에러)
 	defer 소켓SUB_MsgPack.Close()
 
-	소켓SUB_JSON, 에러 := lib.New소켓SUB(lib.P주소_NH실시간_JSON)
+	소켓SUB_JSON, 에러 := lib.New소켓SUB(lib.P주소_NH_실시간_JSON)
 	lib.F테스트_에러없음(t, 에러)
 	defer 소켓SUB_JSON.Close()
 
@@ -373,7 +396,6 @@ func f실시간_서비스_수신(질의_인수 *sRT질의_인수) []interface{} 
 
 	for _, 소켓SUB := range 소켓SUB_모음 {
 		수신_메시지 := lib.New소켓_메시지_내용없음().S소켓_수신(소켓SUB, lib.P무기한)
-		lib.F체크포인트(수신_메시지.G자료형_문자열(0))
 
 		switch 수신_메시지.G자료형_문자열(0) {
 		case nh호가_잔량:

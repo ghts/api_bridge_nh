@@ -44,7 +44,7 @@ import (
 	"unsafe"
 )
 
-func f일반TR_실행(TR식별번호 int64, TR코드 string, c데이터 *C.char, 길이, 계좌_인덱스 int) bool {
+func f일반TR_실행(TR식별번호 int64, TR코드 string, c데이터 unsafe.Pointer, 길이, 계좌_인덱스 int) bool {
 	cTR식별번호 := C.int(TR식별번호)
 	cTR코드 := C.CString(TR코드)
 	c길이 := C.int(길이)
@@ -53,7 +53,7 @@ func f일반TR_실행(TR식별번호 int64, TR코드 string, c데이터 *C.char,
 	defer C.free(unsafe.Pointer(cTR코드))
 	//defer C.free(unsafe.Pointer(c데이터))	// 생성한 곳에서 free()하도록 한다.
 
-	반환값 := C.wmcaQuery(cTR식별번호, cTR코드, c데이터, c길이, c계좌_인덱스)
+	반환값 := C.wmcaQuery(cTR식별번호, cTR코드, (*C.char)(c데이터), c길이, c계좌_인덱스)
 
 	return bool(반환값)
 }

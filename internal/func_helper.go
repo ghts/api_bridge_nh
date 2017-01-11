@@ -66,7 +66,7 @@ func F초기화() (에러 error) {
 	lib.F조건부_패닉(!fDLL존재함(), "DLL파일(%v)을 찾을 수 없습니다.", wmca_dll)
 	lib.F조건부_패닉(lib.F파일_없음(f설정화일_경로()), "설정화일(%v)을 찾을 수 없습니다.", f설정화일_경로())
 
-	Go루틴_모음 := []func(chan lib.T신호){Go루틴_TR처리, go루틴_API_실시간_정보_중계, go루틴_소켓TR_중계}
+	Go루틴_모음 := [](func(chan lib.T신호) error){Go루틴_TR처리, Go루틴_소켓TR_중계, Go루틴_API_실시간_정보_중계}
 	ch초기화 := make(chan lib.T신호, len(Go루틴_모음))
 
 	for _, Go루틴 := range Go루틴_모음 {
@@ -77,7 +77,7 @@ func F초기화() (에러 error) {
 		<-ch초기화
 	}
 
-	lib.New소켓_질의(lib.P주소_NH_TR, lib.CBOR, lib.P10초).S질의(&(lib.S질의값_단순TR{TR구분:lib.TR접속})).G응답()
+	lib.New소켓_질의(lib.P주소_NH_TR, lib.CBOR, lib.P10초).S질의(&(lib.S질의값_단순TR{TR구분: lib.TR접속})).G응답()
 
 	return nil
 }

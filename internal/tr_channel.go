@@ -33,7 +33,7 @@ along with GHTS.  If not, see <http://www.gnu.org/licenses/>. */
 
 package internal
 
-// #cgo CFLAGS: -Wall
+// #cgo CFLAGS: -m32 -Wall
 // #include <stdlib.h>
 // #include "./c_func.h"
 import "C"
@@ -47,7 +47,6 @@ import (
 )
 
 var TR식별번호 = lib.New안전한_일련번호()
-
 var TR처리_Go루틴_실행_중 = lib.New안전한_bool(false)
 var ch조회 = make(chan lib.I채널_질의, 1000)
 var ch주문 = make(chan lib.I채널_질의, 1000)
@@ -58,24 +57,19 @@ var ch접속_해제 = make(chan lib.I채널_질의, 10)
 var ch접속됨 = make(chan lib.I채널_질의, 10)
 var ch실시간_정보 = make(chan interface{}, 10000)
 var ch주문_응답 = make(chan *lib.NH주문_응답, 1000)
-
-// 호출 후 콜백을 수신할 때까지 대기하는 임시 저장소
 var 대기항목_맵 = make(map[int64]*lib.S콜백_대기항목)
 
-// NH OpenAPI는 thread-safe 하다고 명시되어 있지 않으므로,
-// 다수 스레드(thread) 혹은 Go루틴에서 API를 호출하는 경우,
-// 문제가 생긴다고 봐야 함.
+// NH OpenAPI은 thread-safe하다고 명시되어 있지 않으므로 thread-unsafe하다고 봐야함.
 // API호출 및 콜백 처리가 1번에 1개씩만 이루어지도록 하기 위하여 Go루틴을 사용함.
-func Go루틴_TR처리(ch초기화 chan lib.T신호) {
-	var 에러 error
+func Go루틴_TR처리(ch초기화 chan lib.T신호) (에러 error) {
 	defer lib.F에러패닉_처리(lib.S에러패닉_처리{M에러: &에러})
 
 	if TR처리_Go루틴_실행_중.G값() {
 		ch초기화 <- lib.P신호_초기화
-		return
+		return nil
 	} else if 에러 = TR처리_Go루틴_실행_중.S값(true); 에러 != nil {
 		ch초기화 <- lib.P신호_초기화
-		return
+		return 에러
 	}
 
 	defer TR처리_Go루틴_실행_중.S값(false)
@@ -89,8 +83,6 @@ func Go루틴_TR처리(ch초기화 chan lib.T신호) {
 	ch초기화 <- lib.P신호_초기화
 
 	for {
-		// TR처리 go루틴.
-		// 실시간 정보 수신은 별도의 Go루틴에서 처림함. (zmq_realtime.go 참조.)
 		select {
 		case 질의 := <-ch조회:
 			f조회TR_처리(질의)
@@ -101,22 +93,21 @@ func Go루틴_TR처리(ch초기화 chan lib.T신호) {
 		case 질의 := <-ch접속됨:
 			질의.S응답(lib.New채널_메시지(f접속됨()))
 		case 질의 := <-ch접속:
-			f접속_TR_처리(질의)
+			f접속_TR처리(질의)
 		case 질의 := <-ch접속_해제:
-			f접속_해제_TR_처리(질의)
+			f접속해제_TR처리(질의)
 		case 질의 := <-ch실시간_정보_일괄_해지:
-			f실시간_정보_모두_해지_TR_처리(질의)
+			f실시간_정보_모두_해지_TR처리(질의)
 		case <-ch정기_점검.C:
 			f유효기간_지난_항목_정리()
 		case <-ch종료:
-			f종료()
-		default:
-			// 처리해야 할 TR이 없을 경우 대기하지 않도록 default: 추가.
+			f종료TR_처리()
+			return nil
+		default: // 처리해야 할 TR이 없을 경우 대기하지 않도록 하기 위함.
+			lib.F실행권한_양보()
 		}
 
-		// 윈도우 메시지 처리. (인수 '1'은 컴파일 에러방지 용도.)
-		C.ProcessWindowsMessage(1)
-		lib.F실행권한_양보()
+		C.ProcessWindowsMessage(1) // 윈도우 메시지 처리. 인수는 컴파일 에러방지용.
 	}
 }
 
@@ -132,20 +123,20 @@ func f조회TR_처리(질의 lib.I채널_질의) {
 	질의값, 에러 := lib.F바이트_변환값_해석(질의.G값(0).([]*lib.S바이트_변환_매개체)[0])
 	lib.F에러2패닉(에러)
 
-	TR코드 := 질의값.(lib.I질의값).G_TR코드()
-
-	// lib.F메모("'NH조회_질의'에 '계좌 인덱스'를 추가하는 것 검토할 것.")
-	// 현재 c1101, c1151 TR만 지원하므로, 계좌 인덱스가 굳이 필요 없음.
-	var 길이 int
-	var c데이터 *C.char
-	defer C.free(unsafe.Pointer(c데이터)) // 변수를 생성한 곳에서 free()하도록 한다.
-
 	// 계좌번호 인덱스란 로그인시 수신한 계좌번호의 순서.
 	// 계좌 인덱스는 숫자형 ‘1’부터 시작되며 ‘0’은 계좌번호를 사용하지 않는다는 의미.
-	계좌_인덱스 := -1
-	대기_항목 := lib.New콜백_대기항목(TR식별번호.G값(), lib.TR조회, TR코드, 질의, lib.P변환형식_기본값)
-	대기항목_맵[대기_항목.G식별번호()] = 대기_항목
+	// 현재 c1101, c1151 TR만 지원하므로, 계좌 인덱스가 굳이 필요 없음.
+	var 계좌_인덱스 = -1
+	var 길이 int
+	var 변환_형식 = 질의.G값(0).([]*lib.S바이트_변환_매개체)[0].G변환_형식()
+	var c데이터 unsafe.Pointer
+	defer func() {
+		if c데이터 != nil {
+			C.free(c데이터)
+		}
+	}()
 
+	TR코드 := 질의값.(lib.I질의값).G_TR코드()
 	switch TR코드 {
 	case lib.NH_TR주식_현재가_조회:
 		종목코드 := 질의값.(*lib.S질의값_단일종목).M종목코드
@@ -177,12 +168,17 @@ func f조회TR_처리(질의 lib.I채널_질의) {
 	lib.F조건부_패닉(길이 == 0, "입력 데이터 길이가 0임.")
 	lib.F조건부_패닉(계좌_인덱스 < 0, "계좌 인덱스가 음수임. %v", 계좌_인덱스)
 
+	대기_항목 := lib.New콜백_대기항목(TR식별번호.G값(), lib.TR조회, TR코드, 질의, 변환_형식)
+	대기항목_맵[대기_항목.G식별번호()] = 대기_항목
+
 	실행결과_참거짓 := f일반TR_실행(대기_항목.G식별번호(), TR코드, c데이터, 길이, 계좌_인덱스)
 	lib.F조건부_패닉(!실행결과_참거짓, "일반TR 실행 에러발생.")
 }
 
 func f주문TR_처리(질의 lib.I채널_질의) {
-	defer lib.F에러패닉_처리(lib.S에러패닉_처리{M함수with패닉내역: func(r interface{}) { 질의.S응답(lib.New채널_메시지_에러(r)) }})
+	defer lib.F에러패닉_처리(lib.S에러패닉_처리{M함수with패닉내역: func(r interface{}) {
+		질의.S응답(lib.New채널_메시지_에러(r))
+	}})
 
 	lib.F조건부_패닉(!f접속됨(), "NH API에 접속되어 있지 않습니다.")
 	lib.F에러2패닉(질의.G검사(1))
@@ -191,20 +187,19 @@ func f주문TR_처리(질의 lib.I채널_질의) {
 	질의값, 에러 := lib.F바이트_변환값_해석(질의.G값(0).([]*lib.S바이트_변환_매개체)[0])
 	lib.F에러2패닉(에러)
 
-	TR코드 := 질의값.(lib.I질의값).G_TR코드()
-
-	// lib.F메모("'NH조회_질의'에 '계좌 인덱스'를 추가하는 것 검토할 것.")
-	// 현재 c1101, c1151 TR만 지원하므로, 계좌 인덱스가 굳이 필요 없음.
-	var 길이 int
-	var c데이터 *C.char
-	defer C.free(unsafe.Pointer(c데이터)) // 변수를 생성한 곳에서 free()하도록 한다.
-
 	// 계좌번호 인덱스란 로그인시 수신한 계좌번호의 순서.
 	// 계좌 인덱스는 숫자형 ‘1’부터 시작되며 ‘0’은 계좌번호를 사용하지 않는다는 의미.
-	계좌_인덱스 := -1
-	대기_항목 := lib.New콜백_대기항목(TR식별번호.G값(), lib.TR주문, TR코드, 질의, lib.P변환형식_기본값)
-	대기항목_맵[대기_항목.G식별번호()] = 대기_항목
+	var 계좌_인덱스 = -1
+	var 길이 int
+	var 변환_형식 = 질의.G값(0).([]*lib.S바이트_변환_매개체)[0].G변환_형식()
+	var c데이터 unsafe.Pointer
+	defer func() {
+		if c데이터 != nil {
+			C.free(c데이터)
+		}
+	}()
 
+	TR코드 := 질의값.(lib.I질의값).G_TR코드()
 	switch TR코드 {
 	case lib.NH_TR주식_매수:
 		주문 := 질의값.(*lib.S질의값_정상주문)
@@ -217,25 +212,28 @@ func f주문TR_처리(질의 lib.I채널_질의) {
 		길이 = int(unsafe.Sizeof(C.Tc8101InBlock{}))
 		계좌_인덱스 = f2계좌_인덱스(주문.M계좌번호)
 	case lib.NH_TR주식_정정:
-		주문 := 질의값.(*lib.S질의값_정정주문)
+		주문 := 질의값.(*lib.S질의값_정정주문_NH)
 		c데이터 = NewTc8103InBlock(주문)
 		길이 = int(unsafe.Sizeof(C.Tc8103InBlock{}))
 		계좌_인덱스 = f2계좌_인덱스(주문.M계좌번호)
 	case lib.NH_TR주식_취소:
-		주문 := 질의값.(*lib.S질의값_취소주문)
+		주문 := 질의값.(*lib.S질의값_취소주문_NH)
 		c데이터 = NewTc8104InBlock(주문)
 		길이 = int(unsafe.Sizeof(C.Tc8104InBlock{}))
 		계좌_인덱스 = f2계좌_인덱스(주문.M계좌번호)
 	case lib.NH_TR_ELW_매도, lib.NH_TR_ELW_매수, lib.NH_TR_ELW_정정_취소,
 		lib.NH_TR선물_옵션_매도_매수_주문,
 		lib.NH_TR선물_옵션_정정_취소_주문:
-		lib.F패닉("%v : 선물, 옵션, ELW 매매기능 구현할 계획 없음.", TR코드)
+		lib.F패닉("선물, 옵션, ELW 매매기능 구현할 계획 없음. '%v'", TR코드)
 	default:
-		lib.F패닉("%v : 존재하지 않는 TR코드", TR코드)
+		lib.F패닉("예상하지 못한 TR코드. '%v'", TR코드)
 	}
 
 	lib.F조건부_패닉(길이 == 0, "입력 데이터 길이가 0임.")
 	lib.F조건부_패닉(계좌_인덱스 < 0, "계좌 인덱스가 음수임. %v", 계좌_인덱스)
+
+	대기_항목 := lib.New콜백_대기항목(TR식별번호.G값(), lib.TR주문, TR코드, 질의, 변환_형식)
+	대기항목_맵[대기_항목.G식별번호()] = 대기_항목
 
 	실행결과_참거짓 := f일반TR_실행(대기_항목.G식별번호(), TR코드, c데이터, 길이, 계좌_인덱스)
 	lib.F조건부_패닉(!실행결과_참거짓, "일반TR 실행 에러발생.")
@@ -256,11 +254,11 @@ func f실시간_정보_TR_처리(질의 lib.I채널_질의) {
 	lib.F조건부_패닉(!ok, "예상하지 못한 자료형. %T", 질의값_인터페이스)
 
 	TR구분 := 질의값.TR구분
-	RT코드 := 질의값.TR코드
+	TR코드 := 질의값.TR코드
 	종목코드_모음 := 질의값.M종목코드_모음
 
 	lib.F조건부_패닉(!f접속됨(), "서버에 접속되지 않았습니다.")
-	lib.F조건부_패닉(!f올바른_RT코드(RT코드), "잘못된 RT코드. %v", RT코드)
+	lib.F조건부_패닉(!f올바른_RT코드(TR코드), "잘못된 RT코드. %v", TR코드)
 	lib.F조건부_패닉(len(종목코드_모음) == 0, "종목코드 내용 없음.")
 
 	단위_길이 := len(종목코드_모음[0])
@@ -282,24 +280,24 @@ func f실시간_정보_TR_처리(질의 lib.I채널_질의) {
 	}
 
 	전체_종목코드 := 버퍼.String()
-	lib.F조건부_패닉(len(전체_종목코드) == 0, "내용 없음. %v", 종목코드_모음)
+	lib.F조건부_패닉(len(전체_종목코드) == 0, "종목 내용 없음.")
 
 	var 실행_결과 bool
 	switch TR구분 {
 	case lib.TR실시간_정보_구독:
-		실행_결과 = f실시간_정보_구독(RT코드, 전체_종목코드, 단위_길이)
+		실행_결과 = f실시간_정보_구독(TR코드, 전체_종목코드, 단위_길이)
 	case lib.TR실시간_정보_해지:
-		실행_결과 = f실시간_정보_해지(RT코드, 전체_종목코드, 단위_길이)
+		실행_결과 = f실시간_정보_해지(TR코드, 전체_종목코드, 단위_길이)
 	default:
 		lib.F패닉("예상하지 못한 질의_구분. %v", TR구분)
 	}
 
-	lib.F조건부_패닉(!실행_결과, "에러 발생. %v %v %v", RT코드, 전체_종목코드, 단위_길이)
+	lib.F조건부_패닉(!실행_결과, "에러 발생. %v %v %v", TR코드, 전체_종목코드, 단위_길이)
 
 	질의.S응답(lib.New채널_메시지(lib.TR응답_완료))
 }
 
-func f접속_TR_처리(질의 lib.I채널_질의) {
+func f접속_TR처리(질의 lib.I채널_질의) {
 	if f접속됨() {
 		lib.New에러("이미 접속되어 있음.")
 		질의.S응답(lib.New채널_메시지(lib.TR응답_완료))
@@ -325,7 +323,7 @@ func f접속_TR_처리(질의 lib.I채널_질의) {
 	// 이후 f접속_콜백_처리()에서 계속 진행됨.
 }
 
-func f접속_해제_TR_처리(질의 lib.I채널_질의) {
+func f접속해제_TR처리(질의 lib.I채널_질의) {
 	defer lib.F에러패닉_처리(lib.S에러패닉_처리{M함수with패닉내역: func(r interface{}) {
 		질의.S응답(lib.New채널_메시지_에러(r))
 	}})
@@ -347,7 +345,7 @@ func f접속_해제_TR_처리(질의 lib.I채널_질의) {
 	lib.F조건부_패닉(!f접속_해제(), "접속 해제 실패.")
 }
 
-func f실시간_정보_모두_해지_TR_처리(질의 lib.I채널_질의) {
+func f실시간_정보_모두_해지_TR처리(질의 lib.I채널_질의) {
 	switch {
 	case !f접속됨():
 		질의.S응답(lib.New채널_메시지_에러(lib.New에러("NH API에 접속되어 있지 않습니다.")))
@@ -381,7 +379,7 @@ func f유효기간_지난_항목_정리() {
 	}
 }
 
-func f종료() {
+func f종료TR_처리() {
 	lib.New채널_질의(ch실시간_정보_일괄_해지, lib.P30초, 1).S질의().G응답()
 	lib.New채널_질의(ch접속_해제, lib.P30초, 1).S질의().G응답()
 }
