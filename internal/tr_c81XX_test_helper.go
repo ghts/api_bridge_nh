@@ -9,7 +9,7 @@ import (
 
 func f매수주문_테스트_도우미(t *testing.T, 계좌번호 string, 종목 *lib.S종목,
 	호가유형 lib.T호가유형, 가격, 수량 int64) int64 {
-	lib.F대기(lib.P500밀리초)
+	lib.F대기(lib.P1초)
 
 	var 주문번호 int64
 
@@ -266,7 +266,7 @@ func f매도주문_테스트_도우미(t *testing.T, 계좌번호 string, 종목
 
 func f정정주문_테스트_도우미(t *testing.T, 계좌번호 string, 종목 *lib.S종목, 정정구분 lib.T잔량_일부,
 	원주문번호, 가격, 수량 int64) int64 {
-	lib.F대기(lib.P500밀리초)
+	lib.F대기(lib.P1초)
 
 	var 주문번호 int64
 
@@ -399,7 +399,7 @@ func f정정주문_테스트_도우미(t *testing.T, 계좌번호 string, 종목
 
 func f취소주문_테스트_도우미(t *testing.T, 계좌번호 string, 종목 *lib.S종목,
 	취소구분 lib.T잔량_일부, 원주문번호, 수량 int64) int64 {
-	lib.F대기(lib.P500밀리초)
+	lib.F대기(lib.P1초)
 
 	var 주문번호 int64
 

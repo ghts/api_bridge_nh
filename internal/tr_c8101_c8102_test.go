@@ -46,6 +46,7 @@ func TestC8101_C8102_주식_매수_매도(t *testing.T) {
 		t.SkipNow()
 	}
 
+	lib.F대기(lib.P3초)
 	lib.F테스트_에러없음(t, f접속_확인())
 
 	f주문_응답_실시간_정보_구독()
@@ -101,8 +102,6 @@ func TestC8101_C8102_주식_매수_매도(t *testing.T) {
 
 		lib.F테스트_같음(t, 구분, lib.TR응답_데이터, lib.TR응답_메시지, lib.TR응답_완료)
 
-		lib.F문자열_출력("매수 %v", 구분.String())
-
 		switch 구분 {
 		case lib.TR응답_데이터:
 			lib.F테스트_같음(t, 응답.G길이(), 2)
@@ -155,6 +154,7 @@ func TestC8101_C8102_주식_매수_매도(t *testing.T) {
 	}
 
 	// 매도
+	lib.F대기(lib.P1초)
 	매도주문_질의값 := new(lib.S질의값_정상주문)
 	매도주문_질의값.TR구분 = lib.TR주문
 	매도주문_질의값.TR코드 = lib.NH_TR주식_매도
@@ -180,8 +180,6 @@ func TestC8101_C8102_주식_매수_매도(t *testing.T) {
 		lib.F테스트_참임(t, ok, 응답)
 
 		lib.F테스트_같음(t, 구분, lib.TR응답_데이터, lib.TR응답_메시지, lib.TR응답_완료)
-
-		lib.F문자열_출력("매도 %v", 구분.String())
 
 		switch 구분 {
 		case lib.TR응답_데이터:
@@ -264,10 +262,8 @@ func TestC8101_C8102_주식_매수_매도(t *testing.T) {
 
 			switch 주문_응답.M매수_매도 {
 			case lib.P매수:
-				lib.F문자열_출력("매수 주문 접수.")
 				매수주문_접수 = true
 			case lib.P매도:
-				lib.F문자열_출력("매도 주문 접수.")
 				매도주문_접수 = true
 			}
 		case lib.NH_RT주문_체결:
@@ -284,10 +280,8 @@ func TestC8101_C8102_주식_매수_매도(t *testing.T) {
 
 			switch 주문_응답.M매수_매도 {
 			case lib.P매수:
-				lib.F문자열_출력("매수 주문 체결. %v", 주문_응답.M수량)
 				누적_매수량 = +주문_응답.M수량
 			case lib.P매도:
-				lib.F문자열_출력("매도 주문 체결. %v", 주문_응답.M수량)
 				누적_매도량 = +주문_응답.M수량
 			}
 		}

@@ -512,27 +512,28 @@ func f주문_응답_실시간_정보_구독() {
 	질의값.TR구분 = lib.TR실시간_정보_구독
 	질의값.TR코드 = lib.NH_RT주문_접수
 
-	lib.F대기(lib.P300밀리초)
+	lib.F대기(lib.P1초)
 	lib.New채널_질의(ch실시간_정보_구독_및_해지, lib.P5초, 1).S질의(질의값).G응답()
 
 	질의값 = new(lib.S질의값_단순TR)
 	질의값.TR구분 = lib.TR실시간_정보_구독
 	질의값.TR코드 = lib.NH_RT주문_체결
 
-	lib.F대기(lib.P300밀리초)
+	lib.F대기(lib.P1초)
 	lib.New채널_질의(ch실시간_정보_구독_및_해지, lib.P5초, 1).S질의(질의값).G응답()
 }
 
 func f주문_응답_실시간_정보_해지() {
+	lib.F대기(lib.P3초)
 	질의값 := new(lib.S질의값_단순TR)
 	질의값.TR구분 = lib.TR실시간_정보_구독
 	질의값.TR코드 = lib.NH_RT주문_접수
 
 	// 거래소에서 보내주는 주문 응답 실시간 데이터 구독 해지.
-	lib.F대기(lib.P300밀리초)
+	lib.F대기(lib.P1초)
 	lib.New채널_질의(ch실시간_정보_구독_및_해지, lib.P5초, 1).S질의(lib.NH_RT주문_접수)
 
-	lib.F대기(lib.P300밀리초)
+	lib.F대기(lib.P1초)
 	lib.New채널_질의(ch실시간_정보_구독_및_해지, lib.P5초, 1).S질의(lib.NH_RT주문_체결)
 
 	// 현재 테스트의 잔여물 실시간 정보 제거. (이후 다른 테스트에 끼치는 영향 최소화)
