@@ -47,9 +47,7 @@ func TestMain(m *testing.M) {
 	lib.F메모("API TR쿼터 정책을 구현해야 함.")
 
 	테스트_결과 := m.Run()
-
 	lib.F테스트_모드_종료()
-	lib.F공통_종료_채널_닫은_후_재설정()
 
 	os.Exit(테스트_결과)
 }
