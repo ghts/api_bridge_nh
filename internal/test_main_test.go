@@ -42,6 +42,7 @@ import (
 
 func TestMain(m *testing.M) {
 	lib.F테스트_모드_시작()
+
 	lib.F에러2패닉(F초기화())
 
 	lib.F메모("API TR쿼터 정책을 구현해야 함.")

@@ -55,7 +55,11 @@ import (
 var 초기화_완료 = lib.New안전한_bool(false)
 
 func F초기화() (에러 error) {
-	defer lib.F에러패닉_처리(lib.S에러패닉_처리{M에러: &에러})
+	defer lib.F에러패닉_처리(lib.S에러패닉_처리{
+		M에러: &에러,
+		M함수: func() {
+			lib.F문자열_출력("초기화 에러 발생. NH계정의 유효기간을 확인하십시오.")
+		}})
 
 	if 초기화_완료.G값() {
 		return nil
@@ -77,7 +81,9 @@ func F초기화() (에러 error) {
 		<-ch초기화
 	}
 
-	lib.New소켓_질의(lib.P주소_NH_TR, lib.CBOR, lib.P10초).S질의(&(lib.S질의값_단순TR{TR구분: lib.TR접속})).G응답()
+	소켓_질의 := lib.New소켓_질의(lib.P주소_NH_TR, lib.CBOR, lib.P20초)
+	소켓_질의.S질의(&(lib.S질의값_단순TR{TR구분: lib.TR접속}))
+	소켓_질의.G응답()
 
 	return nil
 }
@@ -502,44 +508,33 @@ func f계좌번호by인덱스(인덱스 int) string {
 }
 
 func f주문_응답_실시간_정보_구독() {
-	// 이전에 실행된 다른 테스트의 잔여물 제거.
-	// 이전 테스트에서 남겨진 실시간 정보 비워냄.
-	for i := 0; i < len(ch주문_응답); i++ {
-		<-ch주문_응답
-	}
+	소켓_질의 := lib.New소켓_질의(lib.P주소_NH_TR, lib.CBOR, lib.P10초)
 
 	질의값 := new(lib.S질의값_단순TR)
 	질의값.TR구분 = lib.TR실시간_정보_구독
+
+	lib.F대기(lib.P1초)
 	질의값.TR코드 = lib.NH_RT주문_접수
+	lib.F에러2패닉(소켓_질의.S질의(질의값).G응답().G에러())
 
 	lib.F대기(lib.P1초)
-	lib.New채널_질의(ch실시간_정보_구독_및_해지, lib.P5초, 1).S질의(질의값).G응답()
-
-	질의값 = new(lib.S질의값_단순TR)
-	질의값.TR구분 = lib.TR실시간_정보_구독
 	질의값.TR코드 = lib.NH_RT주문_체결
-
-	lib.F대기(lib.P1초)
-	lib.New채널_질의(ch실시간_정보_구독_및_해지, lib.P5초, 1).S질의(질의값).G응답()
+	lib.F에러2패닉(소켓_질의.S질의(질의값).G응답().G에러())
 }
 
 func f주문_응답_실시간_정보_해지() {
-	lib.F대기(lib.P3초)
+	소켓_질의 := lib.New소켓_질의(lib.P주소_NH_TR, lib.CBOR, lib.P10초)
+
 	질의값 := new(lib.S질의값_단순TR)
-	질의값.TR구분 = lib.TR실시간_정보_구독
+	질의값.TR구분 = lib.TR실시간_정보_해지
+
+	lib.F대기(lib.P1초)
 	질의값.TR코드 = lib.NH_RT주문_접수
-
-	// 거래소에서 보내주는 주문 응답 실시간 데이터 구독 해지.
-	lib.F대기(lib.P1초)
-	lib.New채널_질의(ch실시간_정보_구독_및_해지, lib.P5초, 1).S질의(lib.NH_RT주문_접수)
+	lib.F에러2패닉(소켓_질의.S질의(질의값).G응답().G에러())
 
 	lib.F대기(lib.P1초)
-	lib.New채널_질의(ch실시간_정보_구독_및_해지, lib.P5초, 1).S질의(lib.NH_RT주문_체결)
-
-	// 현재 테스트의 잔여물 실시간 정보 제거. (이후 다른 테스트에 끼치는 영향 최소화)
-	for i := 0; i < len(ch주문_응답); i++ {
-		<-ch주문_응답
-	}
+	질의값.TR코드 = lib.NH_RT주문_체결
+	lib.F에러2패닉(소켓_질의.S질의(질의값).G응답().G에러())
 }
 
 func f설정화일_경로() string {

@@ -160,8 +160,8 @@ func f주식_현재가_조회_기본_정보_테스트(t *testing.T, s *lib.NH주
 	lib.F에러2패닉(에러)
 
 	지금 := time.Now()
-	삼분전 := 지금.Add(-3 * time.Minute)
-	삼분후 := 지금.Add(3 * time.Minute)
+	십분전 := 지금.Add(-10 * time.Minute)
+	십분후 := 지금.Add(10 * time.Minute)
 	금일_0시 := time.Date(지금.Year(), 지금.Month(), 지금.Day(), 0, 0, 0, 0, 지금.Location())
 	금일_9시 := 금일_0시.Add(9 * time.Hour)
 	개장_시각 := 금일_9시
@@ -245,12 +245,12 @@ func f주식_현재가_조회_기본_정보_테스트(t *testing.T, s *lib.NH주
 	lib.F테스트_같음(t, s.M시가+s.M시가대비_등락폭, s.M현재가) // 시가대비_등락폭 자체에 부호가 반영되어 있음.
 	lib.F테스트_참임(t, s.M시각.After(개장일_0시.Add(-1*time.Second)))
 	lib.F테스트_참임(t, s.M시각.Before(개장일_0시.Add(18*time.Hour)), s.M시각)
-	lib.F테스트_참임(t, s.M시각.Before(삼분후))
+	lib.F테스트_참임(t, s.M시각.Before(십분후))
 
 	if lib.F한국증시_정규시장_거래시간임() { // 장중
 		lib.F메모("현재가 시각이 상당히 이전 시간이 나오는 경우 발견함.")
-		lib.F테스트_참임(t, s.M시각.After(삼분전), s.M시각, 삼분전)
-		lib.F테스트_참임(t, s.M시각.Before(삼분후), s.M시각, 삼분후)
+		lib.F테스트_참임(t, s.M시각.After(십분전), s.M시각, 십분전)
+		lib.F테스트_참임(t, s.M시각.Before(십분후), s.M시각, 십분후)
 	} else { // 장중이 아니면 마감 시각 기록.
 		lib.F테스트_같음(t, s.M시각.Hour(), 14, 15)
 	}
@@ -337,12 +337,12 @@ func f주식_현재가_조회_기본_정보_테스트(t *testing.T, s *lib.NH주
 
 	시가총액_근사값 := s.M현재가 * s.M상장_주식수 / 100000000
 	lib.F테스트_참임(t, lib.F오차율(s.M시가_총액_억, 시가총액_근사값) < 10)
-	lib.F테스트_참임(t, s.M거래원_정보_수신_시각.Before(삼분후),
-		s.M거래원_정보_수신_시각, 삼분후)
+	lib.F테스트_참임(t, s.M거래원_정보_수신_시각.Before(십분후),
+		s.M거래원_정보_수신_시각, 십분후)
 
 	if lib.F한국증시_정규시장_거래시간임() {
 		lib.F테스트_참임(t, s.M거래원_정보_수신_시각.After(개장_시각))
-		lib.F테스트_참임(t, s.M시각.Before(삼분후))
+		lib.F테스트_참임(t, s.M시각.Before(십분후))
 	}
 
 	매도_거래량_합계 := int64(0)
@@ -381,7 +381,7 @@ func f주식_현재가_조회_기본_정보_테스트(t *testing.T, s *lib.NH주
 		s.M외국인_시간, 개장일_0시.Add(23*time.Hour))
 
 	if lib.F한국증시_정규시장_거래시간임() {
-		lib.F테스트_참임(t, s.M외국인_시간.Before(삼분후))
+		lib.F테스트_참임(t, s.M외국인_시간.Before(십분후))
 	}
 
 	lib.F테스트_참임(t, s.M외국인_지분율 >= 0)
@@ -408,7 +408,7 @@ func f주식_현재가_조회_기본_정보_테스트(t *testing.T, s *lib.NH주
 	lib.F테스트_참임(t, s.M상장일.Before(개장일_0시.Add(1*time.Second)))
 	lib.F테스트_참임(t, s.M대주주_지분율 >= 0)
 	lib.F테스트_참임(t, s.M대주주_지분율 <= 100)
-	lib.F테스트_참임(t, s.M대주주_지분율_정보_일자.Before(삼분후),
+	lib.F테스트_참임(t, s.M대주주_지분율_정보_일자.Before(십분후),
 		s.M대주주_지분율_정보_일자)
 	//lib.F변수값_확인(s.M네잎클로버_종목_여부)	// NH투자증권 선정 추천 종목
 	lib.F테스트_참임(t, s.M증거금_비율 >= 0)
