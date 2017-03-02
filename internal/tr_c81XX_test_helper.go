@@ -270,7 +270,7 @@ func f정정주문_테스트_도우미(t *testing.T, 계좌번호 string, 종목
 
 	var 주문번호 int64
 
-	정정주문_질의값 := new(lib.S질의값_정정주문_NH)
+	정정주문_질의값 := lib.New질의값_정정주문_NH()
 	정정주문_질의값.TR구분 = lib.TR주문
 	정정주문_질의값.TR코드 = lib.NH_TR주식_정정
 	정정주문_질의값.M증권사 = lib.P증권사_NH
@@ -286,8 +286,6 @@ func f정정주문_테스트_도우미(t *testing.T, 계좌번호 string, 종목
 
 	질의 := lib.New채널_질의(ch주문, lib.P10초, 1).S질의(소켓_메시지)
 
-	lib.F문자열_출력("%v", 정정주문_질의값)
-
 	데이터_수신_완료, 완료_통보_수신_완료 := false, false
 
 	for {
@@ -296,10 +294,6 @@ func f정정주문_테스트_도우미(t *testing.T, 계좌번호 string, 종목
 
 		구분, ok := 응답.G값(0).(lib.TR응답_구분)
 		lib.F테스트_참임(t, ok, 응답)
-
-		lib.F테스트_같음(t, 구분, lib.TR응답_데이터, lib.TR응답_완료)
-
-		lib.F문자열_출력("정정 %v", 구분.String())
 
 		switch 구분 {
 		case lib.TR응답_데이터:
@@ -347,8 +341,6 @@ func f정정주문_테스트_도우미(t *testing.T, 계좌번호 string, 종목
 		lib.F테스트_같음(t, 주문_응답.RT코드, lib.NH_RT주문_접수, lib.NH_RT주문_체결)
 		p1분전 := time.Now().Add(-1 * lib.P1분)
 		p1분후 := time.Now().Add(lib.P1분)
-
-		lib.F문자열_출력("%v", 주문_응답)
 
 		switch 주문_응답.RT코드 {
 		case lib.NH_RT주문_접수:
@@ -403,7 +395,7 @@ func f취소주문_테스트_도우미(t *testing.T, 계좌번호 string, 종목
 
 	var 주문번호 int64
 
-	취소주문_질의값 := new(lib.S질의값_취소주문_NH)
+	취소주문_질의값 := lib.New질의값_취소주문_NH()
 	취소주문_질의값.TR구분 = lib.TR주문
 	취소주문_질의값.TR코드 = lib.NH_TR주식_취소
 	취소주문_질의값.M증권사 = lib.P증권사_NH
@@ -479,8 +471,6 @@ func f취소주문_테스트_도우미(t *testing.T, 계좌번호 string, 종목
 		p1분전 := time.Now().Add(-1 * lib.P1분)
 		p1분후 := time.Now().Add(lib.P1분)
 
-		lib.F문자열_출력("%v", 주문_응답)
-
 		switch 주문_응답.RT코드 {
 		case lib.NH_RT주문_접수:
 			lib.F테스트_같음(t, 주문_응답.M주문응답_구분, lib.P주문응답_취소)
@@ -488,9 +478,7 @@ func f취소주문_테스트_도우미(t *testing.T, 계좌번호 string, 종목
 			lib.F테스트_참임(t, 주문_응답.M주문번호 > 0, 주문_응답.M주문번호)
 			lib.F테스트_같음(t, 주문_응답.M종목코드, 종목.G코드())
 			lib.F테스트_같음(t, 주문_응답.M매수_매도, lib.P매수)
-
-			lib.F메모("취소주문 접수 수량이 이상함.")
-			//lib.F테스트_같음(t, 주문_응답.M수량, 수량)
+			lib.F테스트_같음(t, 주문_응답.M수량, 수량)
 
 			lib.F테스트_같음(t, 주문_응답.M가격, 0)
 			lib.F테스트_참임(t, 주문_응답.M시각.After(p1분전), 주문_응답.M시각, time.Now())
@@ -504,9 +492,7 @@ func f취소주문_테스트_도우미(t *testing.T, 계좌번호 string, 종목
 			lib.F테스트_참임(t, 주문_응답.M주문번호 > 0, 주문_응답.M주문번호)
 			lib.F테스트_같음(t, 주문_응답.M종목코드, 종목.G코드())
 			lib.F테스트_같음(t, 주문_응답.M매수_매도, lib.P매수)
-
-			lib.F메모("취소주문 체결 수량이 이상함.")
-			//lib.F테스트_같음(t, 주문_응답.M수량, 수량)
+			lib.F테스트_같음(t, 주문_응답.M수량, 수량)
 
 			lib.F테스트_같음(t, 주문_응답.M가격, 0)
 			lib.F테스트_참임(t, 주문_응답.M시각.After(p1분전), 주문_응답.M시각, time.Now())

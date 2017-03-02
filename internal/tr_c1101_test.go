@@ -44,9 +44,6 @@ import (
 )
 
 func TestC1101_주식_현재가(t *testing.T) {
-	lib.F메모("주식 현재가 시각값이 비어있는 경우가 종종 발생함.")
-	t.SkipNow()
-
 	lib.F대기(lib.P3초)
 	lib.F테스트_에러없음(t, f접속_확인())
 
@@ -325,7 +322,7 @@ func f주식_현재가_조회_기본_정보_테스트(t *testing.T, s *lib.NH주
 	lib.F테스트_참임(t, lib.F오차율(s.M상한가, float64(s.M전일_종가)*1.3) < 5)
 	lib.F테스트_참임(t, lib.F오차율(s.M하한가, float64(s.M전일_종가)*0.7) < 5)
 	lib.F테스트_참임(t, s.M대용가 < s.M전일_종가)
-	lib.F테스트_참임(t, s.M대용가 > int64(float64(s.M전일_종가)*0.5))
+	lib.F테스트_참임(t, s.M대용가 > int64(float64(s.M전일_종가)*0.5), s.M대용가, s.M전일_종가)
 	lib.F테스트_참임(t, s.M공모가 >= 0, s.M공모가)
 	lib.F테스트_참임(t, s.M52주_저가_일자.After(일년전), s.M52주_저가_일자)
 	lib.F테스트_참임(t, s.M52주_저가_일자.Before(지금), s.M52주_저가_일자)

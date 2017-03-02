@@ -42,6 +42,7 @@ import (
 )
 
 func TestC8101_C8102_주식_매수_매도(t *testing.T) {
+	lib.F메모("단일 테스트하면 잘 되는 데, 전체 테스트하면 에러 발생.")
 	if !lib.F한국증시_정규시장_거래시간임() {
 		t.SkipNow()
 	}
