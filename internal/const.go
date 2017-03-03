@@ -34,6 +34,7 @@ along with GHTS.  If not, see <http://www.gnu.org/licenses/>. */
 package internal
 
 const wmca_dll = "wmca.dll"
+const DLL경로_기본값 = `C:\NH_OpenAPI\wmca.dll`
 const 실행_성공 = "completed successfully"
 
 const (

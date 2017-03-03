@@ -67,7 +67,7 @@ func F초기화() (에러 error) {
 		return nil
 	}
 
-	lib.F조건부_패닉(!fDLL존재함(), "DLL파일(%v)을 찾을 수 없습니다.", wmca_dll)
+	lib.F에러2패닉(fOpenAPI_초기화())
 	lib.F조건부_패닉(lib.F파일_없음(f설정화일_경로()), "설정화일(%v)을 찾을 수 없습니다.", f설정화일_경로())
 
 	Go루틴_모음 := [](func(chan lib.T신호) error){Go루틴_TR처리, Go루틴_소켓TR_중계, Go루틴_API_실시간_정보_중계}
@@ -84,6 +84,31 @@ func F초기화() (에러 error) {
 	소켓_질의 := lib.New소켓_질의(lib.P주소_NH_TR, lib.CBOR, lib.P20초)
 	소켓_질의.S질의(&(lib.S질의값_단순TR{TR구분: lib.TR접속}))
 	소켓_질의.G응답()
+
+	return nil
+}
+
+func fOpenAPI_초기화() (에러 error) {
+	var 파일경로 string
+	if 파일경로, 에러 = lib.F실행파일_검색(wmca_dll); 에러 == nil {
+		return nil
+	}
+
+	if _, 에러 = os.Stat(DLL경로_기본값); 에러 == nil {
+		파일경로 = DLL경로_기본값
+	} else {
+		파일경로, 에러 = lib.F파일_검색(wmca_dll)
+	}
+
+	if 에러 != nil {
+		return lib.New에러("DLL파일을 찾을 수 없습니다.")
+	}
+
+	lib.F실행경로_추가(파일경로)
+
+	if _, 에러 = lib.F실행파일_검색(wmca_dll); 에러 != nil {
+		return lib.New에러("실행경로에 추가시켰으나 여전히 찾을 수 없음.")
+	}
 
 	return nil
 }
