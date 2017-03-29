@@ -99,18 +99,8 @@ func f접속(아이디, 암호, 공인인증서_암호 string) bool {
 	c웹_공지 := C.CString("NOTICEINTRO")
 	c긴급_공지 := C.CString("NOTICEURGENT")
 	cN := C.CString("N")
-	var c서버_이름 *C.char
-	var c포트_번호 C.int
-
-	if lib.F테스트_모드_실행_중() {
-		//lib.F문자열_출력("테스트용 모의 서버")
-		c서버_이름 = C.CString("newmt.wontrading.com")
-		c포트_번호 = C.int(8400)
-	} else {
-		lib.F문자열_출력("거래 서버")
-		c서버_이름 = C.CString("wmca.wontrading.com")
-		c포트_번호 = C.int(8200)
-	}
+	c서버_이름 := C.CString(lib.F서버명_NH())
+	c포트_번호 := C.int(lib.F포트번호_NH())
 
 	defer func() {
 		C.free(unsafe.Pointer(c아이디))
