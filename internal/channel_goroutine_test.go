@@ -43,32 +43,6 @@ import (
 	"strings"
 )
 
-func f접속_확인() error {
-	if f접속됨() {
-		return nil
-	}
-
-	lib.F대기(lib.P1초)
-	질의 := lib.New채널_질의(ch접속, lib.P10초, 1).S질의()
-
-	for i := 0; i < 2; i++ {
-		응답 := 질의.G응답() // 메시지와 로그인 정보 2가지 응답이 가능함.
-
-		if f접속됨() { // 접속되기만 하면 응답 종류에 상관없이 완료 처리.
-			return nil
-		}
-
-		lib.F에러_출력(응답.G에러())
-		lib.F변수값_확인(응답.G값_모음())
-	}
-
-	if !f접속됨() {
-		return lib.New에러("접속 시도 실패")
-	}
-
-	return nil
-}
-
 func TestCh접속됨(t *testing.T) {
 	lib.F대기(lib.P3초)
 
