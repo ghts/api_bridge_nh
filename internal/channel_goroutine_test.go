@@ -66,8 +66,6 @@ func TestCh접속됨(t *testing.T) {
 }
 
 func TestCh접속(t *testing.T) {
-	t.SkipNow()
-
 	if f접속됨() {
 		// 다른 테스트를 진행하려면 접속이 선행되어야 하므로,
 		// 굳이 접속을 별도로 테스트 하는 것은 무의미한 듯 함.

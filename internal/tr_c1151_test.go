@@ -46,6 +46,10 @@ import (
 )
 
 func TestC1151_ETF_현재가(t *testing.T) {
+	if !lib.F한국증시_정규시장_거래시간임() {
+		t.SkipNow()
+	}
+
 	lib.F대기(lib.P3초)
 	f_ETF_현재가_조회_테스트(t, lib.F임의_종목_ETF())
 }

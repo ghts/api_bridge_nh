@@ -33,6 +33,77 @@ along with GHTS.  If not, see <http://www.gnu.org/licenses/>. */
 
 package internal
 
+import (
+	"github.com/ghts/lib"
+
+	"sync"
+)
+
+func New대기항목_저장소() *s대기항목_저장소 {
+	대기항목_저장소 := new(s대기항목_저장소)
+	대기항목_저장소.저장소 = make(map[int64]*lib.S콜백_대기항목)
+
+	return 대기항목_저장소
+}
+
+type s대기항목 struct {
+	키  int64
+	내용 *lib.S콜백_대기항목
+}
+
+type s대기항목_저장소 struct {
+	sync.RWMutex
+	저장소 map[int64]*lib.S콜백_대기항목
+}
+
+func (s *s대기항목_저장소) G대기항목(키 int64) *s대기항목 {
+	s.RLock()
+	defer s.RUnlock()
+
+	내용, 존재함 := s.저장소[키]
+	if !존재함 {
+		return nil
+	}
+
+	대기항목 := new(s대기항목)
+	대기항목.키 = 키
+	대기항목.내용 = 내용
+
+	return 대기항목
+}
+
+func (s *s대기항목_저장소) G대기항목_모음() []*s대기항목 {
+	s.RLock()
+	defer s.RUnlock()
+
+	대기항목_모음 := make([]*s대기항목, 0)
+
+	for 키, 항목 := range s.저장소 {
+		대기항목 := new(s대기항목)
+		대기항목.키 = 키
+		대기항목.내용 = 항목
+
+		대기항목_모음 = append(대기항목_모음, 대기항목)
+	}
+
+	return 대기항목_모음
+}
+
+func (s *s대기항목_저장소) S추가(대기항목 *lib.S콜백_대기항목) {
+	s.Lock()
+	defer s.Unlock()
+
+	s.저장소[대기항목.G식별번호()] = 대기항목
+}
+
+func (s *s대기항목_저장소) S삭제(키 int64) {
+	s.Lock()
+	defer s.Unlock()
+
+	delete(s.저장소, 키)
+}
+
+
 //----------------------------------------------------------------------//
 // WMCA 문자 message 구조체
 //----------------------------------------------------------------------//
