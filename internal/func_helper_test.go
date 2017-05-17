@@ -56,11 +56,3 @@ func TestP등락부호_상수(t *testing.T) {
 func TestDLL존재함(t *testing.T) {
 	lib.F테스트_참임(t, fDLL존재함())
 }
-
-func TestF접속됨(t *testing.T) {
-	if f접속됨() {
-		f접속_해제()
-	}
-
-	lib.F테스트_거짓임(t, f접속됨())
-}
