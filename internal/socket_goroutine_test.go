@@ -768,8 +768,6 @@ func u1_k1_수신_테스트(t *testing.T, 질의_인수 *sRT질의_인수) {
 func TestTR소켓_접속됨(t *testing.T) {
 	lib.F메모("단일 테스트에서는 잘 되지만, 일괄 테스트에서는 에러가 발생함. 원인 불명")
 
-	t.SkipNow()
-
 	lib.F대기(lib.P3초)
 
 	질의값 := new(lib.S질의값_단순TR)
@@ -789,11 +787,7 @@ func TestTR소켓_접속(t *testing.T) {
 	변환_형식 := lib.F임의_변환형식()
 	소켓_질의 := lib.New소켓_질의(lib.P주소_NH_TR, 변환_형식, lib.P30초)
 
-	lib.F체크포인트()
-
 	for f접속됨() {
-		lib.F체크포인트("우선 접속 해제 해야 함.")
-
 		질의값 := new(lib.S질의값_단순TR)
 		질의값.TR구분 = lib.TR접속_해제
 
@@ -802,11 +796,7 @@ func TestTR소켓_접속(t *testing.T) {
 		lib.F테스트_에러없음(t, 응답.G에러())
 		lib.F테스트_거짓임(t, f접속됨())
 		lib.F대기(lib.P1초)
-
-		lib.F체크포인트("접속 해제.")
 	}
-
-	lib.F체크포인트("접속 시작")
 
 	질의값 := new(lib.S질의값_단순TR)
 	질의값.TR구분 = lib.TR접속
@@ -816,9 +806,6 @@ func TestTR소켓_접속(t *testing.T) {
 	lib.F테스트_같음(t, 응답.G길이(), 1)
 
 	로그인_정보 := new(lib.NH로그인_정보)
-
-	lib.F체크포인트(응답.G자료형_문자열(0))
-
 	lib.F테스트_에러없음(t, 응답.G값(0, 로그인_정보))
 	lib.F테스트_다름(t, 로그인_정보.M접속_ID, "")
 	lib.F테스트_다름(t, 로그인_정보.M접속_서버, "")

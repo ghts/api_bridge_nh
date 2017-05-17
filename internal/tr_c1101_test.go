@@ -118,10 +118,7 @@ func TestC1101_주식_현재가(t *testing.T) {
 			lib.F테스트_참임(t, ok)
 
 			lib.F테스트_참임(t, strings.Contains(메시지, "조회완료"))
-			lib.F체크포인트("완료 메시지")
 			continue
-
-			lib.F체크포인트("기타 메시지.\n%v", 메시지)
 		case lib.TR응답_완료:
 			// 완료 응답이 수신된 이후에도 정보가 수신되므로, break 하면 안 됨.
 			lib.F테스트_같음(t, 응답.G길이(), 2)

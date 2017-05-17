@@ -133,9 +133,8 @@ func TestCh접속(t *testing.T) {
 	}
 }
 
+/* 접속 테스트 과정에서 이미 테스트 진행되었음.
 func TestCh접속_해제(t *testing.T) {
-	t.SkipNow()
-
 	lib.F대기(lib.P3초)
 	lib.F테스트_에러없음(t, f접속_확인())
 
@@ -155,3 +154,4 @@ func TestCh접속_해제(t *testing.T) {
 	lib.F테스트_같음(t, 구분, lib.TR응답_완료)
 	lib.F테스트_거짓임(t, f접속됨())
 }
+*/
