@@ -1098,7 +1098,7 @@ func NewNH체결_코스피(c *C.char) (s *lib.NH체결) {
 	s.M누적_거래량 = lib.F2정수64_단순형(g.Volume)
 	s.M전일대비_거래량_비율 = lib.F2실수_소숫점_추가(g.VsPrevVolRate, 2)
 	s.M변동_거래량 = lib.F2정수64_단순형(g.DiffVolume)
-	s.M거래_대금_100만 = lib.F2정수64_단순형(g.TrAmount)
+	s.M거래대금_100만 = lib.F2정수64_단순형(g.TrAmount)
 	s.M시가 = lib.F2정수64_단순형(g.Open)
 	s.M가중_평균_가격 = lib.F2정수64_단순형(g.WeightAvgPrice)
 
@@ -1135,7 +1135,7 @@ func NewNH체결_코스닥(c *C.char) (s *lib.NH체결) {
 	s.M누적_거래량 = lib.F2정수64_단순형(g.Volume)
 	s.M전일대비_거래량_비율 = lib.F2실수_소숫점_추가(g.VsPrevVolRate, 2)
 	s.M변동_거래량 = lib.F2정수64_단순형(g.DiffVolume)
-	s.M거래_대금_100만 = lib.F2정수64_단순형(g.TrAmount)
+	s.M거래대금_100만 = lib.F2정수64_단순형(g.TrAmount)
 	s.M시가 = lib.F2정수64_단순형(g.Open)
 	s.M가중_평균_가격 = lib.F2정수64_단순형(g.WeightAvgPrice)
 
@@ -1195,14 +1195,14 @@ func NewNH업종_지수(c *C.char) (s *lib.NH업종지수) {
 	s.M등락부호 = f2등락부호(g.DiffSign)
 	s.M등락폭 = lib.F2실수_소숫점_추가(g.Diff, 2)
 	s.M거래량 = lib.F2정수64_단순형(g.Volume)
-	s.M거래_대금 = lib.F2정수64_단순형(g.TrAmount)
+	s.M거래대금 = lib.F2정수64_단순형(g.TrAmount)
 	s.M개장값 = lib.F2실수_소숫점_추가(g.Open, 2)
 	s.M최고값 = lib.F2실수_소숫점_추가(g.High, 2)
 	s.M최고값_시각 = lib.F2한국증시_개장일_시각_단순형("15:04:05", g.HighTime)
 	s.M최저값 = lib.F2실수_소숫점_추가(g.Low, 2)
 	s.M최저값_시각 = lib.F2한국증시_개장일_시각_단순형("15:04:05", g.LowTime)
 	s.M지수_등락율 = lib.F2실수_소숫점_추가(g.DiffRate, 2)
-	s.M거래_비중 = lib.F2실수_소숫점_추가(g.TrVolRate, 2)
+	s.M거래비중 = lib.F2실수_소숫점_추가(g.TrVolRate, 2)
 
 	return s
 }
