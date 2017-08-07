@@ -43,6 +43,7 @@ const (
 	P합성복제 string = "합성복제"
 	P일반형  string = "일반형"
 	P파생형  string = "파생형"
+	P비과세 string = "비과세"
 )
 
 // 주문유형
