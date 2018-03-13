@@ -1,4 +1,4 @@
-/* Copyright (C) 2015-2016 김운하(UnHa Kim)  unha.kim@kuh.pe.kr
+/* Copyright (C) 2015-2018 김운하(UnHa Kim)  unha.kim@kuh.pe.kr
 
 이 파일은 GHTS의 일부입니다.
 
@@ -15,7 +15,7 @@ GNU LGPL 2.1판은 이 프로그램과 함께 제공됩니다.
 (자유 소프트웨어 재단 : Free Software Foundation, Inc.,
 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA)
 
-Copyright (C) 2015년 UnHa Kim (unha.kim@kuh.pe.kr)
+Copyright (C) 2015~2017년 UnHa Kim (unha.kim@kuh.pe.kr)
 
 This file is part of GHTS.
 
@@ -58,7 +58,7 @@ func TestC8101_C8102_주식_매수_매도(t *testing.T) {
 	const 매도주문량 = 1
 
 	종목 := lib.New종목("069500", "KODEX 200", lib.P시장구분_ETF)
-	일일종목정보, 에러 := lib.F일일_종목정보(종목)
+	일일종목정보, 에러 := lib.F일일_종목정보_다음넷(종목)
 	lib.F테스트_에러없음(t, 에러)
 
 	계좌번호 := f계좌번호by인덱스(1)
@@ -80,7 +80,7 @@ func TestC8101_C8102_주식_매수_매도(t *testing.T) {
 	매수주문_질의값.M호가유형 = lib.P호가유형_지정가 // 모의투자에서는 시장가 매매가 지원되지 않음.
 	매수주문_질의값.M주문조건 = lib.P주문조건_없음
 
-	소켓_메시지, 에러 := lib.New소켓_메시지(lib.F임의_변환형식(), 매수주문_질의값)
+	소켓_메시지, 에러 := lib.New소켓_메시지(lib.F임의_변환_형식(), 매수주문_질의값)
 	lib.F테스트_에러없음(t, 에러)
 
 	질의 := lib.New채널_질의(ch주문, lib.P10초, 1).S질의(소켓_메시지)
@@ -170,7 +170,7 @@ func TestC8101_C8102_주식_매수_매도(t *testing.T) {
 	매도주문_질의값.M호가유형 = lib.P호가유형_지정가 // 모의투자에서는 시장가 매매가 지원되지 않음.
 	매도주문_질의값.M주문조건 = lib.P주문조건_없음
 
-	소켓_메시지, 에러 = lib.New소켓_메시지(lib.F임의_변환형식(), 매도주문_질의값)
+	소켓_메시지, 에러 = lib.New소켓_메시지(lib.F임의_변환_형식(), 매도주문_질의값)
 	lib.F테스트_에러없음(t, 에러)
 
 	질의 = lib.New채널_질의(ch주문, lib.P30초, 1).S질의(소켓_메시지)

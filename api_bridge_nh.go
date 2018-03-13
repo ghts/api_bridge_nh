@@ -1,4 +1,4 @@
-/* Copyright (C) 2015-2016 김운하(UnHa Kim)  unha.kim@kuh.pe.kr
+/* Copyright (C) 2015-2018 김운하(UnHa Kim)  unha.kim@kuh.pe.kr
 
 이 파일은 GHTS의 일부입니다.
 
@@ -15,7 +15,7 @@ GNU LGPL 2.1판은 이 프로그램과 함께 제공됩니다.
 (자유 소프트웨어 재단 : Free Software Foundation, Inc.,
 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA)
 
-Copyright (C) 2015년 UnHa Kim (unha.kim@kuh.pe.kr)
+Copyright (C) 2015~2017년 UnHa Kim (unha.kim@kuh.pe.kr)
 
 This file is part of GHTS.
 
@@ -41,7 +41,7 @@ import (
 func main() {
 	lib.F테스트_모드_시작() // 이것을 파라메터로 조정할 수 있도록 할 것.
 
-	lib.F에러2패닉(internal.F초기화())
+	lib.F에러체크(internal.F초기화())
 	//lib.F문자열_출력("초기화 완료")
 
 	<-lib.F공통_종료_채널()

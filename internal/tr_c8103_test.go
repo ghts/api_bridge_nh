@@ -1,4 +1,4 @@
-/* Copyright (C) 2015-2016 김운하(UnHa Kim)  unha.kim@kuh.pe.kr
+/* Copyright (C) 2015-2018 김운하(UnHa Kim)  unha.kim@kuh.pe.kr
 
 이 파일은 GHTS의 일부입니다.
 
@@ -15,7 +15,7 @@ GNU LGPL 2.1판은 이 프로그램과 함께 제공됩니다.
 (자유 소프트웨어 재단 : Free Software Foundation, Inc.,
 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA)
 
-Copyright (C) 2015년 UnHa Kim (unha.kim@kuh.pe.kr)
+Copyright (C) 2015~2017년 UnHa Kim (unha.kim@kuh.pe.kr)
 
 This file is part of GHTS.
 
@@ -53,7 +53,7 @@ func TestC8103_주식_정정주문(t *testing.T) {
 	const 수량_정상주문 = int64(25)
 
 	종목 := lib.New종목("069500", "KODEX 200", lib.P시장구분_ETF)
-	일일_종목정보, 에러 := lib.F일일_종목정보(종목)
+	일일_종목정보, 에러 := lib.F일일_종목정보_다음넷(종목)
 	lib.F테스트_에러없음(t, 에러)
 
 	최소_호가단위, 에러 := lib.F최소_호가단위by종목(종목)

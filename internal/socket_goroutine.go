@@ -1,4 +1,4 @@
-/* Copyright (C) 2015-2016 김운하(UnHa Kim)  unha.kim@kuh.pe.kr
+/* Copyright (C) 2015-2018 김운하(UnHa Kim)  unha.kim@kuh.pe.kr
 
 이 파일은 GHTS의 일부입니다.
 
@@ -15,7 +15,7 @@ GNU LGPL 2.1판은 이 프로그램과 함께 제공됩니다.
 (자유 소프트웨어 재단 : Free Software Foundation, Inc.,
 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA)
 
-Copyright (C) 2015년 UnHa Kim (unha.kim@kuh.pe.kr)
+Copyright (C) 2015~2017년 UnHa Kim (unha.kim@kuh.pe.kr)
 
 This file is part of GHTS.
 
@@ -59,15 +59,15 @@ func Go루틴_API_실시간_정보_중계(ch초기화 chan lib.T신호) (에러 
 	defer 실시간_정보_중계_중.S값(false)
 
 	소켓PUB_CBOR, 에러 := lib.New소켓PUB(lib.P주소_NH_실시간_CBOR)
-	lib.F에러2패닉(에러)
+	lib.F에러체크(에러)
 	defer 소켓PUB_CBOR.Close()
 
 	소켓PUB_MsgPack, 에러 := lib.New소켓PUB(lib.P주소_NH_실시간_MsgPack)
-	lib.F에러2패닉(에러)
+	lib.F에러체크(에러)
 	defer 소켓PUB_MsgPack.Close()
 
 	소켓PUB_JSON, 에러 := lib.New소켓PUB(lib.P주소_NH_실시간_JSON)
-	lib.F에러2패닉(에러)
+	lib.F에러체크(에러)
 	defer 소켓PUB_JSON.Close()
 
 	ch종료 := lib.F공통_종료_채널()
@@ -187,19 +187,19 @@ func f소켓TR_처리(소켓REP mangos.Socket, ch초기화 chan<- lib.T신호, c
 
 	for {
 		raw메시지, 에러 = 소켓REP.RecvMsg()
-		lib.F에러2패닉(에러)
+		lib.F에러체크(에러)
 		defer raw메시지.Free() // GC부담을 덜어주고, 재활용을 통한 성능 향상을 꾀함.
 
 		바이트_모음 := raw메시지.Body
 		수신_메시지 := lib.New소켓_메시지from바이트_모음(바이트_모음)
-		lib.F에러2패닉(수신_메시지.G에러())
+		lib.F에러체크(수신_메시지.G에러())
 
 		회신_메시지, 에러 = f소켓TR_처리_도우미(수신_메시지)
-		lib.F에러2패닉(에러)
+		lib.F에러체크(에러)
 
 		if 회신_메시지 != nil {
 			에러 = 회신_메시지.S소켓_회신(소켓REP, lib.P30초, raw메시지)
-			lib.F에러2패닉(에러)
+			lib.F에러체크(에러)
 		}
 
 		select {
@@ -218,7 +218,7 @@ func f소켓TR_처리_도우미(수신_메시지 lib.I소켓_메시지) (응답_
 	lib.F조건부_패닉(수신_메시지.G길이() != 1, "잘못된 메시지 길이. 예상값 1, 실제값 %v. %v", 수신_메시지.G길이(), 수신_메시지)
 
 	TR질의값, 에러 := lib.F소켓_메시지_해석(수신_메시지, 0)
-	lib.F에러2패닉(에러)
+	lib.F에러체크(에러)
 
 	변환_형식 := 수신_메시지.G변환_형식(0)
 	TR구분 := TR질의값.(lib.I질의값).G_TR구분()
@@ -233,7 +233,7 @@ func f소켓TR_처리_도우미(수신_메시지 lib.I소켓_메시지) (응답_
 		// 데이터가 여러 번에 나누어서 수신되며, 수신된 데이터를 취합해서 1개의 회신 메시지를 생성함.
 		for {
 			응답 := 채널_질의.G응답()
-			lib.F에러2패닉(응답.G에러())
+			lib.F에러체크(응답.G에러())
 
 			TR응답_구분, ok := 응답.G값(0).(lib.TR응답_구분)
 			lib.F조건부_패닉(!ok, "예상하지 못한 자료형. %T", 응답.G값(0))
@@ -271,7 +271,7 @@ func f소켓TR_처리_도우미(수신_메시지 lib.I소켓_메시지) (응답_
 
 		for {
 			응답 := 채널_질의.G응답()
-			lib.F에러2패닉(응답.G에러())
+			lib.F에러체크(응답.G에러())
 
 			TR응답_구분, ok := 응답.G값(0).(lib.TR응답_구분)
 			lib.F조건부_패닉(!ok, "예상하지 못한 자료형. %T", 응답.G값(0))
@@ -289,7 +289,7 @@ func f소켓TR_처리_도우미(수신_메시지 lib.I소켓_메시지) (응답_
 
 		for {
 			응답 := 채널_질의.G응답()
-			lib.F에러2패닉(응답.G에러())
+			lib.F에러체크(응답.G에러())
 
 			TR구분, ok := 응답.G값(0).(lib.TR응답_구분)
 			lib.F조건부_패닉(!ok, "예상하지 못한 자료형. %T", 응답.G값(0))
@@ -306,7 +306,7 @@ func f소켓TR_처리_도우미(수신_메시지 lib.I소켓_메시지) (응답_
 					lib.F조건부_패닉(!ok, "예상하지 못한 자료형. %T", 응답.G값(1))
 
 					로그인_정보 := new(lib.NH로그인_정보)
-					lib.F에러2패닉(변환값.G값(로그인_정보))
+					lib.F에러체크(변환값.G값(로그인_정보))
 
 					return lib.New소켓_메시지(변환_형식, 로그인_정보)
 				default:
@@ -322,7 +322,7 @@ func f소켓TR_처리_도우미(수신_메시지 lib.I소켓_메시지) (응답_
 
 		for {
 			응답 := 채널_질의.G응답()
-			lib.F에러2패닉(응답.G에러())
+			lib.F에러체크(응답.G에러())
 			lib.F조건부_패닉(응답.G길이() != 1, "예상하지 못한 길이. %v", 응답.G길이())
 
 			TR응답_구분, ok := 응답.G값(0).(lib.TR응답_구분)
@@ -341,7 +341,7 @@ func f소켓TR_처리_도우미(수신_메시지 lib.I소켓_메시지) (응답_
 
 		for {
 			응답 := 채널_질의.G응답()
-			lib.F에러2패닉(응답.G에러())
+			lib.F에러체크(응답.G에러())
 			lib.F조건부_패닉(응답.G길이() != 1, "예상하지 못한 길이. %v", 응답.G길이())
 
 			TR응답_구분, ok := 응답.G값(0).(lib.TR응답_구분)
@@ -357,7 +357,7 @@ func f소켓TR_처리_도우미(수신_메시지 lib.I소켓_메시지) (응답_
 		}
 	case lib.TR접속됨:
 		응답 := lib.New채널_질의(ch접속됨, lib.P30초, 10).S질의(수신_메시지).G응답()
-		lib.F에러2패닉(응답.G에러())
+		lib.F에러체크(응답.G에러())
 		lib.F조건부_패닉(응답.G길이() != 1, "예상하지 못한 길이. 예상값 1, 실제값 %v", 응답.G길이())
 
 		접속_여부, ok := 응답.G값(0).(bool)
@@ -467,7 +467,7 @@ func f일반TR_응답_메시지_생성(변환_형식 lib.T변환, 질의값 inte
 				에러 = lib.New에러("에상하지 못한 자료형. %v", 단일값_바이트_변환.G자료형_문자열())
 			}
 
-			lib.F에러2패닉(에러)
+			lib.F에러체크(에러)
 		}
 
 		lib.F조건부_패닉(응답값.M질의 == nil || 응답값.M기본_정보 == nil ||
@@ -495,7 +495,7 @@ func f일반TR_응답_메시지_생성(변환_형식 lib.T변환, 질의값 inte
 				에러 = lib.New에러("예상하지 못한 자료형. %v", 변환값.G자료형_문자열())
 			}
 
-			lib.F에러2패닉(에러)
+			lib.F에러체크(에러)
 		}
 
 		lib.F조건부_패닉(응답값.M질의 == nil || 응답값.M기본_정보 == nil ||

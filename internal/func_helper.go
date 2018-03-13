@@ -1,4 +1,4 @@
-/* Copyright (C) 2015-2016 김운하(UnHa Kim)  unha.kim@kuh.pe.kr
+/* Copyright (C) 2015-2018 김운하(UnHa Kim)  unha.kim@kuh.pe.kr
 
 이 파일은 GHTS의 일부입니다.
 
@@ -15,7 +15,7 @@ GNU LGPL 2.1판은 이 프로그램과 함께 제공됩니다.
 (자유 소프트웨어 재단 : Free Software Foundation, Inc.,
 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA)
 
-Copyright (C) 2015년 UnHa Kim (unha.kim@kuh.pe.kr)
+Copyright (C) 2015~2017년 UnHa Kim (unha.kim@kuh.pe.kr)
 
 This file is part of GHTS.
 
@@ -67,7 +67,7 @@ func F초기화() (에러 error) {
 		return nil
 	}
 
-	lib.F에러2패닉(fOpenAPI_초기화())
+	lib.F에러체크(fOpenAPI_초기화())
 	lib.F조건부_패닉(lib.F파일_없음(f설정화일_경로()), "설정화일(%v)을 찾을 수 없습니다.", f설정화일_경로())
 
 	Go루틴_모음 := [](func(chan lib.T신호) error){Go루틴_TR처리, Go루틴_소켓TR_중계, Go루틴_API_실시간_정보_중계}
@@ -287,7 +287,7 @@ func fDLL존재함() bool {
 		return false
 	}
 
-	lib.F에러2패닉(lib.F실행경로_추가(DLL파일_예상경로))
+	lib.F에러체크(lib.F실행경로_추가(DLL파일_예상경로))
 
 	return lib.F2참거짓(windows.NewLazyDLL(wmca_dll).Load(), nil, true)
 }
@@ -302,21 +302,21 @@ func f접속_정보() (아이디, 암호, 공인인증_암호 string) {
 	}
 
 	cfg파일, 에러 := ini.Load(f설정화일_경로())
-	lib.F에러2패닉(에러)
+	lib.F에러체크(에러)
 
 	섹션, 에러 := cfg파일.GetSection("NH_OpenApi_LogIn_Info")
-	lib.F에러2패닉(에러)
+	lib.F에러체크(에러)
 
 	키_ID, 에러 := 섹션.GetKey("ID")
-	lib.F에러2패닉(에러)
+	lib.F에러체크(에러)
 	아이디 = 키_ID.String()
 
 	키_PWD, 에러 := 섹션.GetKey("PWD")
-	lib.F에러2패닉(에러)
+	lib.F에러체크(에러)
 	암호 = 키_PWD.String()
 
 	키_CertPWD, 에러 := 섹션.GetKey("CertPWD")
-	lib.F에러2패닉(에러)
+	lib.F에러체크(에러)
 	공인인증_암호 = 키_CertPWD.String()
 
 	return
@@ -490,7 +490,7 @@ func f2신용거래_구분(값 int) lib.T신용거래_구분 {
 
 func f2매수_매도(값 interface{}) lib.T매수_매도 {
 	정수값, 에러 := lib.F2정수(값)
-	lib.F에러2패닉(에러)
+	lib.F에러체크(에러)
 
 	switch 정수값 {
 	case NH매수:
@@ -540,11 +540,11 @@ func f주문_응답_실시간_정보_구독() {
 
 	lib.F대기(lib.P1초)
 	질의값.TR코드 = lib.NH_RT주문_접수
-	lib.F에러2패닉(소켓_질의.S질의(질의값).G응답().G에러())
+	lib.F에러체크(소켓_질의.S질의(질의값).G응답().G에러())
 
 	lib.F대기(lib.P1초)
 	질의값.TR코드 = lib.NH_RT주문_체결
-	lib.F에러2패닉(소켓_질의.S질의(질의값).G응답().G에러())
+	lib.F에러체크(소켓_질의.S질의(질의값).G응답().G에러())
 }
 
 func f주문_응답_실시간_정보_해지() {
@@ -555,11 +555,11 @@ func f주문_응답_실시간_정보_해지() {
 
 	lib.F대기(lib.P1초)
 	질의값.TR코드 = lib.NH_RT주문_접수
-	lib.F에러2패닉(소켓_질의.S질의(질의값).G응답().G에러())
+	lib.F에러체크(소켓_질의.S질의(질의값).G응답().G에러())
 
 	lib.F대기(lib.P1초)
 	질의값.TR코드 = lib.NH_RT주문_체결
-	lib.F에러2패닉(소켓_질의.S질의(질의값).G응답().G에러())
+	lib.F에러체크(소켓_질의.S질의(질의값).G응답().G에러())
 }
 
 func f설정화일_경로() string {

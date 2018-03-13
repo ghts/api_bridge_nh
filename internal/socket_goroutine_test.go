@@ -1,4 +1,4 @@
-/* Copyright (C) 2015-2016 김운하(UnHa Kim)  unha.kim@kuh.pe.kr
+/* Copyright (C) 2015-2018 김운하(UnHa Kim)  unha.kim@kuh.pe.kr
 
 이 파일은 GHTS의 일부입니다.
 
@@ -15,7 +15,7 @@ GNU LGPL 2.1판은 이 프로그램과 함께 제공됩니다.
 (자유 소프트웨어 재단 : Free Software Foundation, Inc.,
 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA)
 
-Copyright (C) 2015년 UnHa Kim (unha.kim@kuh.pe.kr)
+Copyright (C) 2015~2017년 UnHa Kim (unha.kim@kuh.pe.kr)
 
 This file is part of GHTS.
 
@@ -69,7 +69,7 @@ func TestTR소켓_주식_현재가_조회(t *testing.T) {
 	lib.F대기(lib.P3초)
 	lib.F테스트_에러없음(t, f접속_확인())
 
-	변환_형식 := lib.F임의_변환형식()
+	변환_형식 := lib.F임의_변환_형식()
 	소켓_질의 := lib.New소켓_질의(lib.P주소_NH_TR, 변환_형식, lib.P30초)
 
 	질의값 := new(lib.S질의값_단일종목)
@@ -97,7 +97,7 @@ func TestTR소켓_ETF_현재가_조회(t *testing.T) {
 	lib.F대기(lib.P3초)
 	lib.F테스트_에러없음(t, f접속_확인())
 
-	변환_형식 := lib.F임의_변환형식()
+	변환_형식 := lib.F임의_변환_형식()
 	소켓_질의 := lib.New소켓_질의(lib.P주소_NH_TR, 변환_형식, lib.P30초)
 
 	질의값 := new(lib.S질의값_단일종목)
@@ -126,7 +126,7 @@ func TestTR소켓_실시간_서비스_등록_및_해지(t *testing.T) {
 
 	lib.F대기(lib.P3초)
 	lib.F테스트_에러없음(t, f접속_확인())
-	변환_형식 := lib.F임의_변환형식()
+	변환_형식 := lib.F임의_변환_형식()
 
 	TR소켓, 에러 := lib.New소켓REQ(lib.P주소_NH_TR)
 	lib.F테스트_에러없음(t, 에러)
@@ -387,7 +387,7 @@ func f실시간_서비스_수신(질의_인수 *sRT질의_인수) []interface{} 
 
 	t := 질의_인수.t
 	lib.F테스트_에러없음(t, f접속_확인())
-	변환_형식 := lib.F임의_변환형식()
+	변환_형식 := lib.F임의_변환_형식()
 	소켓_질의 := lib.New소켓_질의(lib.P주소_NH_TR, 변환_형식, lib.P30초)
 
 	// 실시간 서비스 등록
@@ -564,12 +564,12 @@ func h3_k5_수신_테스트(t *testing.T, 질의_인수 *sRT질의_인수) {
 		if s.M예상_등락폭 != 0 &&
 			s.M예상_체결가 != 0 &&
 			s.M예상_등락율 != 0 {
-			예상_등락율_근사값 := lib.F2절대값(
+			예상_등락율_근사값 := lib.F절대값_실수(
 				float64(s.M예상_등락폭) / float64(s.M예상_체결가) * 100)
 
 			lib.F테스트_참임(t,
-				lib.F오차(lib.F2절대값(s.M예상_등락율), 예상_등락율_근사값) < 5 ||
-					lib.F오차율(lib.F2절대값(s.M예상_등락율), 예상_등락율_근사값) < 10)
+				lib.F오차(lib.F절대값_실수(s.M예상_등락율), 예상_등락율_근사값) < 5 ||
+					lib.F오차율_퍼센트(lib.F절대값_실수(s.M예상_등락율), 예상_등락율_근사값) < 10)
 		}
 
 		lib.F테스트_참임(t, s.M예상_체결수량 >= 0, s.M예상_체결수량)
@@ -587,11 +587,11 @@ func h3_k5_수신_테스트(t *testing.T, 질의_인수 *sRT질의_인수) {
 		}
 
 		if s.M예상_체결가 > 0 && s.M매도_호가 > 0 {
-			lib.F테스트_참임(t, lib.F오차율(s.M예상_체결가, s.M매도_호가) < 60)
+			lib.F테스트_참임(t, lib.F오차율_퍼센트(s.M예상_체결가, s.M매도_호가) < 60)
 		}
 
 		if s.M예상_체결가 > 0 && s.M매수_호가 > 0 {
-			lib.F테스트_참임(t, lib.F오차율(s.M예상_체결가, s.M매수_호가) < 60)
+			lib.F테스트_참임(t, lib.F오차율_퍼센트(s.M예상_체결가, s.M매수_호가) < 60)
 		}
 	}
 }
@@ -619,10 +619,10 @@ func j8_k8_수신_테스트(t *testing.T, 질의_인수 *sRT질의_인수) {
 		lib.F테스트_참임(t, s.M현재가 >= 0, s.M현재가)
 
 		등락율_근사값 := float64(s.M등락폭) / float64(s.M현재가) * 100
-		오차율 := lib.F오차율(s.M등락율, 등락율_근사값)
+		오차율 := lib.F오차율_퍼센트(s.M등락율, 등락율_근사값)
 		오차 := lib.F오차(s.M등락율, 등락율_근사값)
 		lib.F테스트_참임(t, 등락율_근사값 <= 30, 등락율_근사값, s.M등락폭, s.M현재가)
-		lib.F테스트_참임(t, lib.F2절대값(s.M등락율) <= 30, s.M등락율)
+		lib.F테스트_참임(t, lib.F절대값_실수(s.M등락율) <= 30, s.M등락율)
 		lib.F테스트_참임(t, 오차율 < 10 || 오차 < 5,
 			s.M종목코드, s.M시각, s.M현재가, s.M등락폭, s.M등락율, 등락율_근사값)
 		lib.F테스트_참임(t, s.M고가 >= s.M현재가 || s.M고가 == 0, s.M현재가, s.M고가)
@@ -662,7 +662,7 @@ func j8_k8_수신_테스트(t *testing.T, 질의_인수 *sRT질의_인수) {
 
 		//거래_대금_근사값 := s.M현재가 * s.M변동_거래량
 		거래_대금_근사값 := s.M현재가 * s.M누적_거래량 / 1000000
-		오차율 = lib.F오차율(s.M거래대금_100만, 거래_대금_근사값)
+		오차율 = lib.F오차율_퍼센트(s.M거래대금_100만, 거래_대금_근사값)
 		오차 = lib.F오차(s.M거래대금_100만, 거래_대금_근사값)
 		lib.F테스트_참임(t, 오차율 < 10 || 오차 < 3,
 			오차율, 오차, s.M거래대금_100만, 거래_대금_근사값,
@@ -773,7 +773,7 @@ func TestTR소켓_접속됨(t *testing.T) {
 	질의값 := new(lib.S질의값_단순TR)
 	질의값.TR구분 = lib.TR접속됨
 
-	응답 := lib.New소켓_질의(lib.P주소_NH_TR, lib.F임의_변환형식(), lib.P30초).S질의(질의값).G응답()
+	응답 := lib.New소켓_질의(lib.P주소_NH_TR, lib.F임의_변환_형식(), lib.P30초).S질의(질의값).G응답()
 	lib.F테스트_에러없음(t, 응답.G에러())
 	lib.F테스트_같음(t, 응답.G길이(), 1)
 
@@ -784,7 +784,7 @@ func TestTR소켓_접속됨(t *testing.T) {
 
 func TestTR소켓_접속(t *testing.T) {
 	lib.F대기(lib.P3초)
-	변환_형식 := lib.F임의_변환형식()
+	변환_형식 := lib.F임의_변환_형식()
 	소켓_질의 := lib.New소켓_질의(lib.P주소_NH_TR, 변환_형식, lib.P30초)
 
 	for f접속됨() {
@@ -828,7 +828,7 @@ func TestTR소켓_접속_해지(t *testing.T) {
 	lib.F테스트_에러없음(t, f접속_확인())
 	lib.F테스트_참임(t, f접속됨())
 
-	변환_형식 := lib.F임의_변환형식()
+	변환_형식 := lib.F임의_변환_형식()
 	소켓_질의 := lib.New소켓_질의(lib.P주소_NH_TR, 변환_형식, lib.P30초)
 
 	질의값 := new(lib.S질의값_단순TR)
@@ -844,7 +844,7 @@ func TestTR소켓_실시간_서비스_모두_해지(t *testing.T) {
 	t.SkipNow()
 
 	lib.F대기(lib.P3초)
-	변환_형식 := lib.F임의_변환형식()
+	변환_형식 := lib.F임의_변환_형식()
 	소켓_질의 := lib.New소켓_질의(lib.P주소_NH_TR, 변환_형식, lib.P30초)
 
 	if f접속됨() {

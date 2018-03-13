@@ -1,4 +1,4 @@
-/* Copyright (C) 2015-2016 김운하(UnHa Kim)  unha.kim@kuh.pe.kr
+/* Copyright (C) 2015-2018 김운하(UnHa Kim)  unha.kim@kuh.pe.kr
 
 이 파일은 GHTS의 일부입니다.
 
@@ -15,7 +15,7 @@ GNU LGPL 2.1판은 이 프로그램과 함께 제공됩니다.
 (자유 소프트웨어 재단 : Free Software Foundation, Inc.,
 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA)
 
-Copyright (C) 2015년 UnHa Kim (unha.kim@kuh.pe.kr)
+Copyright (C) 2015~2017년 UnHa Kim (unha.kim@kuh.pe.kr)
 
 This file is part of GHTS.
 
@@ -155,7 +155,7 @@ func TestC1101_주식_현재가(t *testing.T) {
 
 func f주식_현재가_조회_기본_정보_테스트(t *testing.T, s *lib.NH주식_현재가_조회_기본_정보, 종목코드 string) {
 	종목, 에러 := lib.F종목by코드(종목코드)
-	lib.F에러2패닉(에러)
+	lib.F에러체크(에러)
 
 	지금 := time.Now()
 	십분전 := 지금.Add(-10 * time.Minute)
@@ -164,7 +164,7 @@ func f주식_현재가_조회_기본_정보_테스트(t *testing.T, s *lib.NH주
 	금일_9시 := 금일_0시.Add(9 * time.Hour)
 	개장_시각 := 금일_9시
 	개장일_0시, 에러 := lib.F한국증시_최근_개장일()
-	lib.F에러2패닉(에러)
+	lib.F에러체크(에러)
 
 	삼십일전 := 지금.Add(-30 * 24 * time.Hour)
 	연초 := time.Date(지금.Year(), time.January, 1, 0, 0, 0, 0, 지금.Location())
@@ -185,7 +185,7 @@ func f주식_현재가_조회_기본_정보_테스트(t *testing.T, s *lib.NH주
 
 	if s.M현재가 != 0 && s.M등락폭 != 0 && s.M등락율 != 0 {
 		등락율_근사값 := math.Abs(float64(s.M등락폭)) / float64(s.M현재가) * 100
-		lib.F테스트_참임(t, lib.F오차율(등락율_근사값, s.M등락율) < 10)
+		lib.F테스트_참임(t, lib.F오차율_퍼센트(등락율_근사값, s.M등락율) < 10)
 	}
 
 	lib.F테스트_참임(t, s.M거래량 >= 0)
@@ -193,7 +193,7 @@ func f주식_현재가_조회_기본_정보_테스트(t *testing.T, s *lib.NH주
 
 	if s.M거래량 != 0 && s.M전일_거래량 != 0 {
 		거래량_비율_근사값 := float64(s.M거래량) / float64(s.M전일_거래량) * 100
-		lib.F테스트_참임(t, lib.F오차율(s.M전일대비_거래량_비율, 거래량_비율_근사값) < 10,
+		lib.F테스트_참임(t, lib.F오차율_퍼센트(s.M전일대비_거래량_비율, 거래량_비율_근사값) < 10,
 			s.M전일대비_거래량_비율, 거래량_비율_근사값, s.M거래량, s.M전일_거래량)
 	}
 
@@ -202,13 +202,13 @@ func f주식_현재가_조회_기본_정보_테스트(t *testing.T, s *lib.NH주
 			float64(s.M유동_주식수_1000주*1000) * 100
 		유동주_회전율_근사값 = math.Trunc(유동주_회전율_근사값*100) / 100
 		lib.F테스트_참임(t, lib.F오차(s.M유동주_회전율, 유동주_회전율_근사값) < 1 ||
-			lib.F오차율(s.M유동주_회전율, 유동주_회전율_근사값) < 10,
+			lib.F오차율_퍼센트(s.M유동주_회전율, 유동주_회전율_근사값) < 10,
 			s.M유동주_회전율, 유동주_회전율_근사값)
 	}
 
 	if s.M거래대금_100만 != 0 && s.M거래량 != 0 && s.M현재가 != 0 {
 		거래대금_근사값 := s.M거래량 * s.M현재가 / 1000000
-		lib.F테스트_참임(t, lib.F오차율(s.M거래대금_100만, 거래대금_근사값) < 10)
+		lib.F테스트_참임(t, lib.F오차율_퍼센트(s.M거래대금_100만, 거래대금_근사값) < 10)
 	}
 
 	if s.M거래량 > 0 {
@@ -320,8 +320,8 @@ func f주식_현재가_조회_기본_정보_테스트(t *testing.T, s *lib.NH주
 	lib.F테스트_같음(t, s.M서킷_브레이커_구분, "", "CB발동", "CB해제", "장종료")
 	lib.F테스트_참임(t, s.M액면가 >= 0, s.M종목코드, s.M액면가, s.M종목코드, s.M종목명) // ETN은 액면가가 없음.
 	//lib.F테스트_참임(t, strings.Contains(s.M전일_종가_타이틀, "전일종가"))
-	lib.F테스트_참임(t, lib.F오차율(s.M상한가, float64(s.M전일_종가)*1.3) < 5)
-	lib.F테스트_참임(t, lib.F오차율(s.M하한가, float64(s.M전일_종가)*0.7) < 5)
+	lib.F테스트_참임(t, lib.F오차율_퍼센트(s.M상한가, float64(s.M전일_종가)*1.3) < 5)
+	lib.F테스트_참임(t, lib.F오차율_퍼센트(s.M하한가, float64(s.M전일_종가)*0.7) < 5)
 	lib.F테스트_참임(t, s.M대용가 < s.M전일_종가)
 	lib.F테스트_참임(t, s.M대용가 > int64(float64(s.M전일_종가)*0.5), s.M대용가, s.M전일_종가)
 	lib.F테스트_참임(t, s.M공모가 >= 0, s.M공모가)
@@ -334,7 +334,7 @@ func f주식_현재가_조회_기본_정보_테스트(t *testing.T, s *lib.NH주
 	lib.F테스트_참임(t, s.M유동_주식수_1000주 >= 0)
 
 	시가총액_근사값 := s.M현재가 * s.M상장_주식수 / 100000000
-	lib.F테스트_참임(t, lib.F오차율(s.M시가_총액_억, 시가총액_근사값) < 10)
+	lib.F테스트_참임(t, lib.F오차율_퍼센트(s.M시가_총액_억, 시가총액_근사값) < 10)
 	lib.F테스트_참임(t, s.M거래원_정보_수신_시각.Before(십분후),
 		s.M거래원_정보_수신_시각, 십분후)
 
@@ -462,7 +462,7 @@ func f주식_현재가_조회_변동_거래량_정보_테스트(t *testing.T,
 	지금 := time.Now()
 	삼분후 := 지금.Add(3 * time.Minute)
 	개장일_0시, 에러 := lib.F한국증시_최근_개장일()
-	lib.F에러2패닉(에러)
+	lib.F에러체크(에러)
 
 	for i, s := range 변동_정보_모음 {
 		lib.F테스트_참임(t, s.M시각.After(개장일_0시.Add(9*time.Hour)))
@@ -520,14 +520,14 @@ func f주식_현재가_조회_동시호가_정보_테스트(t *testing.T,
 	lib.F테스트_참임(t, f올바른_등락부호(s.M예상_체결_부호), s.M예상_체결_부호)
 	lib.F테스트_참임(t, s.M예상_체결가 <= 기본_정보.M상한가)
 	lib.F테스트_참임(t, s.M예상_체결가 >= 기본_정보.M하한가)
-	lib.F테스트_참임(t, lib.F오차율(s.M예상_체결가, 기본_정보.M현재가) < 10)
+	lib.F테스트_참임(t, lib.F오차율_퍼센트(s.M예상_체결가, 기본_정보.M현재가) < 10)
 	lib.F테스트_같음(t, f등락부호2정수(s.M예상_체결_부호)*s.M예상_등락폭,
 		s.M예상_체결가-기본_정보.M전일_종가)
 
 	if s.M예상_등락폭 != 0 && s.M예상_등락율 != 0 {
 		예상_등락율_근사값 := math.Abs(float64(s.M예상_등락폭)) /
 			float64(s.M예상_체결가) * 100
-		lib.F테스트_참임(t, lib.F오차율(s.M예상_등락율, 예상_등락율_근사값) < 10)
+		lib.F테스트_참임(t, lib.F오차율_퍼센트(s.M예상_등락율, 예상_등락율_근사값) < 10)
 	}
 
 	lib.F테스트_참임(t, s.M예상_체결_수량 >= 0)
